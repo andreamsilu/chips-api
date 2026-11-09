@@ -51,7 +51,7 @@ Ensure all four `chips-api-*` programs are running before enabling deployments. 
 Use `visudo -f /etc/sudoers.d/chips-api-deploy` to grant these exact service operations (one line):
 
 ```sudoers
-deploy ALL=(root) NOPASSWD: /usr/bin/systemctl reload php8.5-fpm, /usr/bin/supervisorctl stop chips-api-payments chips-api-notifications chips-api-scheduler chips-api-reverb, /usr/bin/supervisorctl start chips-api-payments chips-api-notifications chips-api-scheduler chips-api-reverb
+deploy ALL=(root) NOPASSWD: /usr/bin/systemctl reload php8.5-fpm, /usr/bin/supervisorctl status chips-api-payments chips-api-notifications chips-api-scheduler chips-api-reverb, /usr/bin/supervisorctl stop chips-api-payments chips-api-notifications chips-api-scheduler chips-api-reverb, /usr/bin/supervisorctl start chips-api-payments chips-api-notifications chips-api-scheduler chips-api-reverb
 ```
 
 Deployment verifies the archive checksum/revision, enters maintenance, stops workers gracefully, backs up code and replaces code/vendor while preserving `.env*`, `storage`, `.git`, deployment backups and the public storage link. It then clears generated bootstrap files, discovers production packages, migrates forward, backfills missing public user IDs, links public storage, warms caches, reloads PHP-FPM, resumes app/workers and checks `/up` plus the database/cache-backed categories endpoint. It creates no accounts or catalogue seed data.

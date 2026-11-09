@@ -30,10 +30,13 @@ trap finish EXIT
 command -v rsync >/dev/null
 command -v curl >/dev/null
 [[ -x "$php_bin" ]]
+[[ -x /usr/bin/supervisorctl && -x /usr/bin/systemctl ]]
 "$php_bin" -r 'foreach (["pdo_mysql", "redis", "dom", "curl"] as $extension) { if (!extension_loaded($extension)) { fwrite(STDERR, "Missing PHP extension: ".$extension."\n"); exit(1); } }'
 sudo -n -l /usr/bin/supervisorctl stop "${services[@]}" >/dev/null
 sudo -n -l /usr/bin/supervisorctl start "${services[@]}" >/dev/null
 sudo -n -l /usr/bin/systemctl reload php8.5-fpm >/dev/null
+sudo -n /usr/bin/supervisorctl status "${services[@]}"
+/usr/bin/systemctl is-active --quiet php8.5-fpm
 
 cd "$incoming"
 sha256sum --check release.tar.gz.sha256
