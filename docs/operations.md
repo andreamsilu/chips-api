@@ -1,5 +1,65 @@
 # Operations and release gates
 
+## GitLab CI/CD
+
+Primary repository: `git@gitlab.com:andreamsilu/chips-api.git`. `.gitlab-ci.yml` runs PHP 8.4/8.5 checks with isolated MySQL 8 and Redis services, the feature/unit suite, real MySQL concurrency tests, Composer validation/audit, Larastan, Pint and OpenAPI consistency. Production dependencies are packaged from `composer.lock`; deployment never runs `composer update`.
+
+Successful protected `main` pipelines automatically deploy to `/var/www/chips-api` on `185.213.27.206`. Protect `main`, restrict who can push/merge and use a Docker-capable GitLab runner. Enable GitLab's prevention of outdated deployment jobs. The job also checks the current `main` revision and uses a GitLab resource group plus a server file lock to serialize deployments.
+
+Configure these GitLab **Settings → CI/CD → Variables**, protected and scoped to the `production` environment:
+
+| Variable | Type | Value |
+| --- | --- | --- |
+| `SSH_PRIVATE_KEY` | File | Dedicated CI-to-server Ed25519 private key, with a trailing newline. Use a separate key from the developer's GitLab push key. |
+| `SSH_KNOWN_HOSTS` | File | Verified SSH host key entry for `185.213.27.206`, obtained through a trusted server console. |
+| `DEPLOY_USER` | Variable | `deploy`, unless a different provisioned account is used. |
+
+The public host, SSH port `22`, application directory and public URL have pipeline defaults. SSH is noninteractive with strict host checking. Keep `.env`, database/Snippe/NextSMS credentials and `APP_KEY` on the server. They are never CI artifacts. Follow [GitLab's SSH variable guidance](https://docs.gitlab.com/ci/jobs/ssh_keys/); multiline key file variables cannot be masked, so restrict protected-ref/environment access and never print them. Do not run unverified `ssh-keyscan` inside the pipeline.
+
+One-time server setup, as root, after the CI files are present in the checkout:
+
+```sh
+apt install -y rsync curl supervisor sudo php8.5-cli php8.5-fpm php8.5-mysql php8.5-redis php8.5-xml php8.5-curl php8.5-mbstring php8.5-bcmath
+id deploy >/dev/null 2>&1 || adduser --disabled-password --gecos '' deploy
+usermod -aG www-data deploy
+chown -R deploy:www-data /var/www/chips-api
+chmod 640 /var/www/chips-api/.env
+chown -R www-data:www-data /var/www/chips-api/storage /var/www/chips-api/bootstrap/cache
+find /var/www/chips-api/storage /var/www/chips-api/bootstrap/cache -type d -exec chmod 2770 {} +
+find /var/www/chips-api/storage /var/www/chips-api/bootstrap/cache -type f -exec chmod 660 {} +
+install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
+```
+
+Generate a separate deployment key on a trusted machine. Put its public key in `/home/deploy/.ssh/authorized_keys`, owned by `deploy:deploy`, mode `600`; put only its private key into the protected `SSH_PRIVATE_KEY` file variable. Keep the private key outside the application directory. On the trusted server console, this prints the public host-key entry for `SSH_KNOWN_HOSTS` on port 22:
+
+```sh
+awk '{print "185.213.27.206 " $1 " " $2}' /etc/ssh/ssh_host_ed25519_key.pub
+```
+
+Configure the server `.env` for production, including valid Redis/MySQL and Reverb credentials. Install managed workers:
+
+```sh
+cp /var/www/chips-api/resources/ci/supervisor.conf /etc/supervisor/conf.d/chips-api.conf
+systemctl enable --now supervisor
+supervisorctl reread
+supervisorctl update
+supervisorctl status
+```
+
+Ensure all four `chips-api-*` programs are running before enabling deployments. This scheduler replaces a separate cron/schedule worker: keep one scheduling mechanism. Configure Reverb privately before starting its worker. Nginx continues using `/var/www/chips-api/public` and the PHP 8.5 FPM socket.
+
+Use `visudo -f /etc/sudoers.d/chips-api-deploy` to grant these exact service operations (one line):
+
+```sudoers
+deploy ALL=(root) NOPASSWD: /usr/bin/systemctl reload php8.5-fpm, /usr/bin/supervisorctl stop chips-api-payments chips-api-notifications chips-api-scheduler chips-api-reverb, /usr/bin/supervisorctl start chips-api-payments chips-api-notifications chips-api-scheduler chips-api-reverb
+```
+
+Deployment verifies the archive checksum/revision, enters maintenance, stops workers gracefully, backs up code and replaces code/vendor while preserving `.env*`, `storage`, `.git`, deployment backups and the public storage link. It then clears generated bootstrap files, discovers production packages, migrates forward, backfills missing public user IDs, links public storage, warms caches, reloads PHP-FPM, resumes app/workers and checks `/up` plus the database/cache-backed categories endpoint. It creates no accounts or catalogue seed data.
+
+Incoming artifacts and previous code remain under `/var/www/chips-api/.deploy`; monitor disk usage and prune only releases no longer needed. A failure after maintenance begins leaves maintenance enabled and reports the backup location. **Database migrations are never automatically rolled back.** Restore compatible code from the reported backup or deploy a forward fix, check schema compatibility, reload PHP-FPM, run `php8.5 artisan up` and restart Supervisor programs. A code backup is not a database backup; retain the existing database backup policy.
+
+Verify the first live pipeline and SSH deployment in GitLab after variables/server prerequisites are configured. Local syntax/static checks do not replace running the pipeline on GitLab's runner.
+
 ## Initial installation
 
 Use PHP 8.4+ with PDO MySQL, Redis, OpenSSL, mbstring, XML, cURL and bcmath; MySQL 8.0.16+; Redis 7; and Composer 2. The Windows development runtime was installed at `%USERPROFILE%\.config\herd-lite\bin`. Reopen an existing terminal if PHP/Composer do not appear on its PATH.

@@ -1,0 +1,126 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_COMMIT_BRANCH != "main"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+stages: [verify, package, deploy]
+
+variables:
+  COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.composer-cache"
+  COMPOSER_ALLOW_SUPERUSER: "1"
+  DEPLOY_HOST: "185.213.27.206"
+  DEPLOY_PORT: "22"
+  DEPLOY_USER: "deploy"
+  DEPLOY_PATH: "/var/www/chips-api"
+  DEPLOY_PUBLIC_URL: "http://185.213.27.206:8087"
+
+.php_job:
+  image: "php:${PHP_VERSION}-cli-bookworm"
+  before_script:
+    - bash resources/ci/setup-php.sh
+  cache:
+    key:
+      files: [composer.lock]
+      prefix: "composer-$PHP_VERSION"
+    paths: [.composer-cache/]
+
+verify:
+  extends: .php_job
+  stage: verify
+  interruptible: true
+  parallel:
+    matrix:
+      - PHP_VERSION: ["8.4", "8.5"]
+  services:
+    - name: mysql:8.0
+      alias: mysql
+    - name: redis:7-alpine
+      alias: redis
+  variables:
+    APP_ENV: testing
+    APP_DEBUG: "false"
+    MYSQL_DATABASE: mloexpress_test
+    MYSQL_USER: ci
+    MYSQL_PASSWORD: ci-test-only
+    MYSQL_ROOT_PASSWORD: ci-root-test-only
+    DB_CONNECTION: mysql
+    DB_HOST: mysql
+    DB_PORT: "3306"
+    DB_DATABASE: mloexpress_test
+    DB_USERNAME: ci
+    DB_PASSWORD: ci-test-only
+    DB_URL: ""
+    REDIS_HOST: redis
+    CACHE_STORE: array
+    QUEUE_CONNECTION: database
+    BROADCAST_CONNECTION: "null"
+    SESSION_DRIVER: array
+    NEXTSMS_ENABLED: "false"
+    SNIPPE_PAYOUTS_ENABLED: "false"
+  script:
+    - composer install --no-interaction --prefer-dist --no-progress
+    - cp .env.example .env
+    - php artisan key:generate --no-interaction
+    - php resources/ci/wait-for-services.php
+    - composer validate --no-check-publish --strict
+    - composer audit
+    - bash -n resources/ci/setup-php.sh resources/ci/deploy-client.sh resources/ci/deploy-server.sh resources/ci/test-deployment.sh
+    - bash resources/ci/test-deployment.sh
+    - php vendor/bin/phpunit --log-junit junit.xml
+    - php vendor/bin/phpunit tests/Integration/MySqlConcurrencyTest.php --log-junit junit-mysql.xml
+    - composer analyse
+    - composer format
+    - git diff --exit-code -- '*.php'
+    - composer openapi
+    - git diff --exit-code -- docs/openapi.json
+  artifacts:
+    when: always
+    expire_in: 7 days
+    reports:
+      junit: [junit.xml, junit-mysql.xml]
+
+package:
+  extends: .php_job
+  stage: package
+  variables:
+    PHP_VERSION: "8.5"
+    APP_ENV: production
+    APP_DEBUG: "false"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_REF_PROTECTED == "true"'
+  script:
+    - composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts
+    - composer check-platform-reqs --no-dev
+    - mkdir release
+    - git archive HEAD | tar -xf - -C release
+    - cp -a vendor release/vendor
+    - printf '%s\n' "$CI_COMMIT_SHA" > release/REVISION
+    - tar -czf release.tar.gz -C release .
+    - sha256sum release.tar.gz > release.tar.gz.sha256
+  artifacts:
+    access: developer
+    expire_in: 1 day
+    paths: [release.tar.gz, release.tar.gz.sha256]
+
+deploy_production:
+  image: alpine:3.23
+  stage: deploy
+  needs: [package]
+  resource_group: chips-api-production
+  interruptible: false
+  environment:
+    name: production
+    url: $DEPLOY_PUBLIC_URL
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_REF_PROTECTED == "true"'
+      when: on_success
+  before_script:
+    - apk add --no-cache bash git openssh-client rsync
+    - test -f "$SSH_PRIVATE_KEY" && test -f "$SSH_KNOWN_HOSTS"
+    - install -d -m 700 ~/.ssh
+    - install -m 600 "$SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
+    - install -m 600 "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
+  script:
+    - bash resources/ci/deploy-client.sh

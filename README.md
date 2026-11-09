@@ -104,3 +104,7 @@ The adjacent chips app defaults to the live API, securely stores Sanctum tokens 
 ## SMS provider
 
 Customer order alerts use NextSMS API v2 through the notifications queue. See [NextSMS configuration and recovery](docs/operations.md#nextsms-customer-order-alerts). Supply NEXTSMS_API_TOKEN and the approved NEXTSMS_SENDER_ID privately, migrate the database, then set NEXTSMS_ENABLED=true and restart workers. Default is disabled. Recipients and message bodies are encrypted; uncertain requests are not automatically resent. Sign-in remains email/password. No live SMS has been sent during implementation.
+
+## GitLab CI/CD
+
+GitLab is the primary remote at `git@gitlab.com:andreamsilu/chips-api.git`. The pipeline checks PHP 8.4/8.5 with MySQL/Redis, packages locked production dependencies and automatically deploys successful protected `main` builds. Configure the deployment account, Supervisor services and protected SSH file variables using [GitLab setup](docs/operations.md#gitlab-cicd). Server secrets and uploads are preserved.
