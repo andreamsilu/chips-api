@@ -1,0 +1,591 @@
+{
+  "openapi": {
+    "summary": "Download the OpenAPI contract",
+    "tag": "Documentation",
+    "response": "OpenApi",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "auth.register": {
+    "summary": "Register a customer account",
+    "tag": "Identity",
+    "response": "UserResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "Register"
+  },
+  "auth.login": {
+    "summary": "Issue an expiring Sanctum token",
+    "tag": "Identity",
+    "response": "TokenResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "Login"
+  },
+  "auth.me": {
+    "summary": "Read the authenticated profile and roles",
+    "tag": "Identity",
+    "response": "UserResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "auth.logout": {
+    "summary": "Revoke the current token",
+    "tag": "Identity",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "addresses.index": {
+    "summary": "List your saved addresses",
+    "tag": "Customers",
+    "response": "AddressList",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "addresses.store": {
+    "summary": "Create your address",
+    "tag": "Customers",
+    "response": "AddressResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "AddressInput"
+  },
+  "addresses.update": {
+    "summary": "Update your address",
+    "tag": "Customers",
+    "response": "AddressResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AddressInput"
+  },
+  "addresses.destroy": {
+    "summary": "Soft-delete your address",
+    "tag": "Customers",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "cart.show": {
+    "summary": "Read your cart and version",
+    "tag": "Checkout",
+    "response": "CartResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "cart.items": {
+    "summary": "Set product quantity; zero removes it",
+    "tag": "Checkout",
+    "response": "CartResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "CartItemInput"
+  },
+  "checkout": {
+    "summary": "Reserve priced items; idempotent checkout",
+    "tag": "Checkout",
+    "response": "OrderResponse",
+    "statuses": [
+      200,
+      201
+    ],
+    "paginate": false,
+    "body": "Checkout"
+  },
+  "orders.index": {
+    "summary": "List your orders",
+    "tag": "Orders",
+    "response": "OrderPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "orders.show": {
+    "summary": "Read an authorized order and snapshots",
+    "tag": "Orders",
+    "response": "OrderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "orders.cancel": {
+    "summary": "Cancel your order before acceptance",
+    "tag": "Orders",
+    "response": "OrderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "Reason"
+  },
+  "orders.refund": {
+    "summary": "Request a full refund for your order",
+    "tag": "Payments",
+    "response": "RefundResponse",
+    "statuses": [
+      202
+    ],
+    "paginate": false,
+    "body": "Reason"
+  },
+  "reviews.store": {
+    "summary": "Review your paid fulfilled order once",
+    "tag": "Reviews",
+    "response": "ReviewResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "ReviewInput"
+  },
+  "reviews.index": {
+    "summary": "Read vendor reviews",
+    "tag": "Reviews",
+    "response": "ReviewPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "locations.index": {
+    "summary": "Discover approved locations by distance",
+    "tag": "Catalogue",
+    "response": "LocationPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "latitude",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        }
+      },
+      {
+        "name": "longitude",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      },
+      {
+        "name": "radius",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      }
+    ]
+  },
+  "categories.index": {
+    "summary": "List catalogue categories",
+    "tag": "Catalogue",
+    "response": "CategoryList",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "products.index": {
+    "summary": "List available location products",
+    "tag": "Catalogue",
+    "response": "ProductPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      {
+        "name": "category_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+        }
+      }
+    ]
+  },
+  "vendors.mine": {
+    "summary": "List your vendor businesses",
+    "tag": "Vendors",
+    "response": "VendorPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "vendors.apply": {
+    "summary": "Apply for vendor approval",
+    "tag": "Vendors",
+    "response": "VendorResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "VendorApplication"
+  },
+  "locations.store": {
+    "summary": "Create a location in your approved business",
+    "tag": "Vendors",
+    "response": "LocationResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "LocationInput"
+  },
+  "locations.update": {
+    "summary": "Update your location",
+    "tag": "Vendors",
+    "response": "LocationResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "LocationInput"
+  },
+  "products.store": {
+    "summary": "Create a product in your location",
+    "tag": "Catalogue",
+    "response": "ProductResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "ProductInput"
+  },
+  "products.update": {
+    "summary": "Update your product",
+    "tag": "Catalogue",
+    "response": "ProductResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "ProductInput"
+  },
+  "coupons.index": {
+    "summary": "List your business coupons",
+    "tag": "Promotions",
+    "response": "CouponPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "coupons.store": {
+    "summary": "Create a vendor-funded coupon",
+    "tag": "Promotions",
+    "response": "CouponResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "CouponInput"
+  },
+  "vendor.orders": {
+    "summary": "List your kitchens incoming orders",
+    "tag": "Orders",
+    "response": "OrderPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "vendor.orders.update": {
+    "summary": "Advance or reject your kitchen order",
+    "tag": "Orders",
+    "response": "OrderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "OrderTransition"
+  },
+  "vendor.orders.cash": {
+    "summary": "Confirm that cash was received for pickup",
+    "tag": "Orders",
+    "response": "OrderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "CashCollection"
+  },
+  "deliveries.index": {
+    "summary": "List only your assigned deliveries",
+    "tag": "Delivery",
+    "response": "AssignedDeliveryPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "deliveries.update": {
+    "summary": "Record pickup or delivery for your assignment",
+    "tag": "Delivery",
+    "response": "DeliveryResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "DeliveryTransition"
+  },
+  "notifications.index": {
+    "summary": "List your queued order notifications",
+    "tag": "Notifications",
+    "response": "NotificationPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "notifications.update": {
+    "summary": "Mark your notification as read",
+    "tag": "Notifications",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "support.index": {
+    "summary": "List your tickets or authorized support queue",
+    "tag": "Support",
+    "response": "SupportTicketPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "support.store": {
+    "summary": "Open a support ticket",
+    "tag": "Support",
+    "response": "TicketResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "TicketInput"
+  },
+  "support.show": {
+    "summary": "Read an authorized ticket and messages",
+    "tag": "Support",
+    "response": "TicketDetail",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "support.message": {
+    "summary": "Reply to an open authorized ticket",
+    "tag": "Support",
+    "response": "SupportMessageResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "SupportMessageInput"
+  },
+  "support.close": {
+    "summary": "Close an authorized ticket",
+    "tag": "Support",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "payments.webhook": {
+    "summary": "Receive signed Snippe payment and payout events",
+    "tag": "Payments",
+    "response": "WebhookResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "SnippeEvent"
+  },
+  "admin.vendors": {
+    "summary": "List businesses for administrative review",
+    "tag": "Administration",
+    "response": "VendorPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "admin.vendors.review": {
+    "summary": "Approve reject or suspend a vendor",
+    "tag": "Administration",
+    "response": "VendorResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "VendorApproval"
+  },
+  "admin.roles": {
+    "summary": "Grant a role to a public user identifier",
+    "tag": "Administration",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "RoleGrant"
+  },
+  "admin.riders": {
+    "summary": "Approve an existing user as a rider",
+    "tag": "Administration",
+    "response": "RiderResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "RiderInput"
+  },
+  "admin.deliveries.assign": {
+    "summary": "Assign a paid ready order to a rider",
+    "tag": "Administration",
+    "response": "AssignmentResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "Assignment"
+  },
+  "admin.refunds.index": {
+    "summary": "List refunds for administrative review",
+    "tag": "Administration",
+    "response": "RefundPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "admin.refunds.approve": {
+    "summary": "Approve a refund or attest a manual return receipt",
+    "tag": "Administration",
+    "response": "RefundResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "RefundApproval",
+    "optional_body": true
+  },
+  "admin.settlements.index": {
+    "summary": "List settlement batches",
+    "tag": "Finance",
+    "response": "SettlementPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "admin.settlements.prepare": {
+    "summary": "Prepare an eligible vendor settlement",
+    "tag": "Finance",
+    "response": "SettlementResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false
+  },
+  "admin.settlements.paid": {
+    "summary": "Attest a verified external settlement transfer",
+    "tag": "Finance",
+    "response": "SettlementResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "SettlementReceipt"
+  },
+  "admin.settlements.void": {
+    "summary": "Void an unpaid batch while retaining allocations",
+    "tag": "Finance",
+    "response": "SettlementResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.audit": {
+    "summary": "Read immutable audit records",
+    "tag": "Administration",
+    "response": "AuditPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true
+  },
+  "auth.update": {
+    "summary": "Update your profile name",
+    "tag": "Identity",
+    "body": "ProfileInput",
+    "response": "UserResponse"
+  },
+  "locations.show": {
+    "summary": "Read an approved vendor location",
+    "tag": "Catalogue",
+    "response": "LocationResponse"
+  },
+  "products.mine": {
+    "summary": "List all products in your location, including unavailable products",
+    "tag": "Catalogue",
+    "response": "ProductPage",
+    "paginate": true
+  },
+  "cart.quote": {
+    "summary": "Review a server-calculated cart total without placing an order",
+    "tag": "Checkout",
+    "body": "Checkout",
+    "response": "QuoteResponse"
+  }
+}

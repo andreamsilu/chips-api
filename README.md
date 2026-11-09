@@ -53,12 +53,13 @@ Common response statuses: 401 unauthenticated, 403 insufficient role, 404 inacce
 1. Discover kitchens with `GET /locations?latitude=-6.77&longitude=39.25&radius=5`, then `GET /locations/{location}/products`.
 2. Save a delivery address through `/addresses` if needed. Use international mobile-money phone format such as `+255712345678`.
 3. Set a cart product with `PUT /cart/items`, for example `{"product_id":"<ulid>","quantity":1,"instructions":"No chilli"}`. Quantity zero removes the item. A cart may contain one vendor location. Prices in cart responses are indicative until server checkout reprices and validates stock.
-4. Read `GET /cart` and retain its `version`.
+4. Read `GET /cart` and retain its `version`. Submit the checkout fields to `POST /cart/quote` for a read-only server total, discount, delivery fee and payment availability. No stock is reserved by quoting.
 5. `POST /checkout` with a fresh `Idempotency-Key` header (8–100 letters/digits/underscores/hyphens) and a body such as:
 
 ```json
 {
   "cart_version": 2,
+  "expected_total": 15000,
   "fulfilment": "delivery",
   "payment_method": "mpesa",
   "phone": "+255712345678",
@@ -70,9 +71,9 @@ Common response statuses: 401 unauthenticated, 403 insufficient role, 404 inacce
 7. Retry a lost checkout response with the **same key and exact body**. It returns the existing reservation and does not charge or reserve again. A changed request with the same key returns 409. A new key means a new operation; never generate one automatically after an uncertain charge.
 8. Vendors accept, prepare and mark ready through `PATCH /vendor/orders/{id}`. Delivery cannot enter preparation without verified mobile-money payment. Administrators assign paid ready deliveries, and only the assigned rider can record `picked_up` / `delivered`.
 
-`pickup` removes the delivery fee and permits `cash`, `mpesa`, `tigo_pesa` (Snippe detects Mixx by Yas from the phone), or `airtel_money`. Cash pickup starts `confirmed` with payment `pending`. An authorized vendor must explicitly post `{"cash_received":true}` to `/vendor/orders/{id}/cash` before marking collection `completed`. The ledger records vendor cash commission as debt rather than a fictitious payable. This cash-pickup rule follows the new backend specification and differs from the adjacent Flutter demo's currently prepaid-only UI.
+`pickup` removes the delivery fee and permits `cash`, `mpesa`, `tigo_pesa` (Snippe detects Mixx by Yas from the phone), or `airtel_money`. Cash pickup starts `confirmed` with payment `pending`. An authorized vendor must explicitly post `{"cash_received":true}` to `/vendor/orders/{id}/cash` before marking collection `completed`. The ledger records vendor cash commission as debt rather than a fictitious payable. The live Flutter client supports this cash-pickup workflow; its explicit demo mode retains prepaid-only behavior.
 
-Delivery fees are configured as a base plus each rounded-up kilometre within the location's service radius. Commissions use the approved vendor's rate in basis points, after a vendor-funded discount; delivery revenue is separate. No client-supplied total, payment status or commission is accepted.
+Delivery fees are configured as a base plus each rounded-up kilometre within the location's service radius. Commissions use the approved vendor's rate in basis points, after a vendor-funded discount; delivery revenue is separate. Client totals never determine charges. The optional expected_total is a price-change guard: a mismatch returns 422 before reservation or payment; review a fresh quote. Payment status and commission remain server-controlled.
 
 ### Real-time and pagination
 
@@ -95,3 +96,11 @@ composer openapi
 
 Tests cover ownership and role isolation, expiring tokens, vendor approval, cart/stock/idempotency, delivery payment gates, cash collection, exact Snippe requests/signatures/status reconciliation, refunds and payout reversals, balanced ledger entries, settlement holds, immutable database history, geographic filtering, queued outbox recovery, coupons and support isolation. Additional real MySQL concurrency tests and PHP 8.4/8.5 CI configuration are included. See [release gates](docs/operations.md#verification-and-outstanding-release-gates) for what was and was not run locally.
 # chips-api
+
+## Flutter integration
+
+The adjacent chips app defaults to the live API, securely stores Sanctum tokens and checkout recovery records, and uses email/password login. It implements server quotes, price-change confirmation, same-key payment retries, customer/vendor order access and explicit vendor cash confirmation. Order updates currently use foreground polling; Reverb remains available for other clients. See ../chips/README.md for local URLs and CORS setup. Added integration endpoints: PATCH /api/v1/auth/me, GET /api/v1/locations/{location}, POST /api/v1/cart/quote and GET /api/v1/vendor/locations/{location}/products.
+
+## SMS provider
+
+Customer order alerts use NextSMS API v2 through the notifications queue. See [NextSMS configuration and recovery](docs/operations.md#nextsms-customer-order-alerts). Supply NEXTSMS_API_TOKEN and the approved NEXTSMS_SENDER_ID privately, migrate the database, then set NEXTSMS_ENABLED=true and restart workers. Default is disabled. Recipients and message bodies are encrypted; uncertain requests are not automatically resent. Sign-in remains email/password. No live SMS has been sent during implementation.

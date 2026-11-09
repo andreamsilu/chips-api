@@ -1,0 +1,96 @@
+# Operations and release gates
+
+## Initial installation
+
+Use PHP 8.4+ with PDO MySQL, Redis, OpenSSL, mbstring, XML, cURL and bcmath; MySQL 8.0.16+; Redis 7; and Composer 2. The Windows development runtime was installed at `%USERPROFILE%\.config\herd-lite\bin`. Reopen an existing terminal if PHP/Composer do not appear on its PATH.
+
+Copy `.env.example` to a private `.env` and provision secrets through your deployment platform. Use a separate migration account with DDL/TRIGGER privileges and a runtime account with the minimum table privileges. Never publish `.env` or use the CI credentials outside disposable tests. Keep `APP_DEBUG=false`. Preserve `APP_KEY` across deployments because payment contact details and immutable provider payloads are encrypted with it; include key recovery in backup procedures.
+
+```sh
+composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+php artisan key:generate # First installation only; never rotate blindly on an existing database.
+php artisan migrate --force
+php artisan marketplace:backfill-user-ids
+php artisan db:seed --force
+php artisan optimize
+php artisan queue:restart
+```
+
+The seeder installs categories only. It intentionally creates no default users or known passwords. Register a real account, then use trusted server access once:
+
+```sh
+php artisan marketplace:bootstrap-admin operator@example.com --confirm
+```
+
+Subsequent grants use the administrator API. Do not grant administrative roles through registration or client-controlled session claims. Existing accounts need customer roles assigned by an administrator before checkout.
+
+## Processes
+
+Supervise PHP-FPM/the application server, a scheduler, separate payment and notification workers, and Reverb. Example worker commands:
+
+```sh
+php artisan queue:work redis --queue=payments --sleep=1 --timeout=45 --tries=6 --max-time=3600
+php artisan queue:work redis --queue=notifications --sleep=1 --timeout=45 --tries=5 --max-time=3600
+php artisan schedule:work
+php artisan reverb:start --host=127.0.0.1 --port=8080
+```
+
+In a traditional deployment run `php artisan schedule:run` every minute instead of `schedule:work`. Queue `retry_after` is 90 seconds by default in the template, longer than the worker timeout. API processes, schedulers and workers must share Redis and the database. Use Redis persistence and a dedicated queue database/namespace; do not evict queue or uniqueness-lock keys with catalogue caches.
+
+Checkout dispatches payment work after commit. A database outbox dispatches notifications after commit. `marketplace:tick` rescans durable pending rows every minute to recover the process-crash or Redis-failure gap; it also expires unpaid 15-minute stock reservations and reconciles acknowledged payment/refund attempts. This command processes bounded batches. Monitor backlog age and adjust scheduler frequency/worker count before load exceeds that capacity.
+
+Expose the web server's `public/` directory only. Enforce HTTPS and body-size limits (16 KiB for payment callbacks) at the proxy. Configure trusted proxy addresses in Laravel for your actual ingress before relying on forwarded scheme/client IP. Set exact CORS origins and Reverb allowed hostnames; never use credentialed wildcard origins. Terminate Reverb TLS at the proxy, retain private-channel authentication and block direct access to its private listener.
+
+## Snippe configuration and certification
+
+The adapter implements Snippe API version `2026-01-25`, using documented REST endpoints and the signed event envelope. Set the same API version in the merchant dashboard. Set `SNIPPE_API_KEY`, `SNIPPE_WEBHOOK_SECRET` and the externally reachable HTTPS `SNIPPE_WEBHOOK_URL` ending in `/api/v1/webhooks/payments`. `SNIPPE_BASE_URL` defaults to `https://api.snippe.sh`. Collection keys need `collection:read` and `collection:create`. Never place a provider key in Flutter, browser JavaScript, a Next.js public environment variable, a URL or a log.
+
+Subscribe to `payment.completed`, `payment.failed`, `payment.expired`, `payment.voided`; refund payouts additionally use `payout.completed`, `payout.failed`, `payout.reversed`. The signature is hex HMAC-SHA256 over `timestamp.raw-body`, from `X-Webhook-Timestamp` and `X-Webhook-Signature`. Unsigned events are rejected even if the provider treats signing as optional. Only the pinned event version is accepted. Store event identifiers and payload hashes, not full payment webhook payloads.
+
+Snippe mobile payments require at least TZS 500. A create response is an acknowledgement, never proof of payment. An authenticated status GET is a second authoritative verification path. The adapter validates amounts, currency, provider reference and order metadata; refunds also validate that the recipient matches the original payer. The provider request body is encrypted and fixed at checkout so retrying the same key cannot silently change the customer or amount. ULID operation keys remain below Snippe's 30-character maximum. Automatic resubmission stops after 23 hours, before the provider's documented 24-hour idempotency expiry.
+
+Refunds are full refunds only. Snippe's published API documents disbursements rather than a native payment-refund endpoint; the adapter returns funds to the original mobile-money phone using an explicitly approved payout. Enable `SNIPPE_PAYOUTS_ENABLED=true` only after account permissions, supported refund networks, balance/fee handling and sandbox tests are confirmed. Such keys also need `disbursement:read` and `disbursement:create`. Refunds below the configured implementation threshold of TZS 5,000, or while disbursements are disabled, enter `manual_required`. After an operator actually returns funds externally, an authorized administrator may attest the unique receipt with `receipt_verified=true`. This administrative attestation is audited; it never initiates a transfer.
+
+Failed/reversed payouts require operator recovery. Do not blindly send another payout with a new key. A reversal retains the original payout reference and appends compensating ledger entries; manual recovery retains its separate receipt. After a network timeout where the provider may have accepted a request, retain the original key and body. If its reference was lost and the safe retry window elapsed, locate the transaction in the merchant dashboard and reconcile it before any new operation. Alert on stale `pending`, `approved`, `manual_required`, `failed` or `reversed` records.
+
+Provider processing fees are merchant expenses and are not deducted from the vendor's snapshotted commission calculation. Reconcile Snippe settlement statements and fees in the accounting close before paying vendors. This implementation does not automatically withdraw vendor settlements: `paid` records an already verified external transfer. Settlement preparation excludes unfulfilled/unpaid/refund-pending orders and carries cash commission debt forward. If a refund changes a prepared batch, payment is blocked; void the unpaid batch and prepare it again. Original allocations remain in history.
+
+Official references: [payments](https://docs.snippe.sh/docs/2026-01-25/payments), [mobile money](https://docs.snippe.sh/docs/2026-01-25/payments/mobile-money), [webhooks](https://docs.snippe.sh/docs/2026-01-25/webhooks), [disbursements](https://docs.snippe.sh/docs/2026-01-25/disbursements/mobile-money).
+
+## Observability, backups and recovery
+
+Alert on failed jobs, oldest unpublished outbox message, ageing payment reservations, uncertain provider operations, unpaid settlements, callback rejection spikes, Redis failures and database deadlocks. Correlate with public order/payment IDs; redact authorization, API keys, phone numbers and provider bodies in upstream logging/APM. Database deadlocks retry transactional workflows three times. Do not retry permanent validation failures as new financial operations.
+
+Inspect failed jobs with `php artisan queue:failed`, fix the cause, and retry selected IDs. The durable scanner may already have recovered their logical operation, so provider idempotency and database constraints remain mandatory. Do not clear all locks or restart queues to conceal a provider outage. An administrator should reconcile provider statements against payments, refunds, the balanced ledger and external settlement receipts each day.
+
+Back up MySQL, application encryption keys and necessary object storage; encrypt backups, restrict access and test point-in-time restoration. Keep financial/order/payment event/audit records according to a published retention policy. Avoid cascading deletes on financial records. MySQL and SQLite migrations install append-only/snapshot triggers; give the runtime account no DDL/trigger-altering permissions. Production schema rollback is a forward-fix operation, not `migrate:reset` or `migrate:fresh`.
+
+## Verification and outstanding release gates
+
+```sh
+composer install
+composer test
+composer analyse
+composer format
+composer validate --no-check-publish
+composer audit
+composer openapi
+```
+
+Local unit/feature tests use isolated SQLite, array cache, null broadcasting and database-backed test queues without running workers. Discovery tests supply SQLite's absent trigonometric functions using their actual PHP math implementations; production MySQL uses native functions. Run the same suite on MySQL 8 before release. The provided CI workflow runs PHP 8.4/8.5 with MySQL 8 and Redis and invokes additional two-process row-lock tests. To run those manually, supply a **disposable MySQL database ending in `_test`** and execute `php vendor/bin/phpunit tests/Integration/MySqlConcurrencyTest.php`. These tests explicitly reset that test database and refuse other names. They cannot establish correctness on SQLite.
+
+At implementation time the existing local MySQL credentials were rejected and Docker's daemon was unavailable. Local MySQL row-lock tests, real Redis queue recovery and Reverb socket delivery therefore remain unverified. CI is supplied but has not been run remotely. Snippe calls are tested with exact HTTP fixtures; no live charge, refund, transfer or sandbox certification has been performed. Configure merchant credentials privately and run account-specific certification before enabling payments. Load tests and `EXPLAIN` plans with production-like vendor/order data, backup/restore drills, secret rotation, provider fee reconciliation and operator approval procedures remain deployment gates.
+
+The adjacent Flutter client is wired to the bearer API and uses email/password authentication, secure token storage and foreground order polling. Its optional demo OTP flow is isolated behind DEMO_MODE=true. A Next.js adapter is not included. Configure exact CORS origins for Flutter Web and HTTPS API_URL for release builds. Email/push delivery is not configured; NextSMS order alerts are available with private configuration; queued in-app notifications and private Reverb invalidations are implemented. Account recovery/email verification, partial refunds, live GPS/maps and automated vendor bank payouts are future integrations, not simulated features.
+
+## NextSMS customer order alerts
+
+Uses the official [NextSMS v2 API](https://www.nextsms.co.tz/api-docs), POST /api/sms/v2/text/single with bearer-token authentication. Configure NEXTSMS_API_TOKEN and your approved NEXTSMS_SENDER_ID privately, then set NEXTSMS_ENABLED=true. Defaults are disabled and credentials are blank in .env.example. Rebuild configuration cache and restart notification workers after changing secrets. No new dependency or client-side secret is needed. Email/password authentication remains unchanged; this integration does not introduce OTP login.
+
+Deployment: run php artisan migrate before enabling SMS or deploying enabled workers. The additive sms_deliveries migration references outbox_messages one-to-one, indexes status/created_at for recovery, and stores recipient/message encrypted using APP_KEY. No existing rows are rewritten. Preserve APP_KEY with backups. Production rollback should be a forward fix; dropping the table loses delivery/reconciliation records.
+
+Run the existing notifications queue and scheduler. Alerts use event snapshots; obsolete unpublished snapshots are skipped rather than prompting customers to authorize a cancelled/already-paid order. Missing/invalid Tanzania customer numbers are skipped. A successful HTTP response must contain an accepted recipient and provider message ID; accepted means provider acceptance, not handset delivery. A 429 is retried by marketplace:tick after at least one minute, with at most five submissions. Other explicit client rejections stop sending.
+
+No automatic resend occurs for unknown outcomes (timeouts, server failures, malformed responses) or submitting records left by a crashed worker. The reference equals the outbox event ID for merchant-dashboard investigation; it is not assumed to provide provider idempotency. Operators must confirm acceptance/rejection in NextSMS reports before considering a resend. Provider response bodies, tokens and plaintext recipients/messages are not written to application logs or failed-job payloads. Delivery callbacks/report polling are not exposed by this change; consult the merchant dashboard for final delivery. Monitor queued, unknown, rejected and stale submitting records. Disabled operation does not backfill already published historical events.
+
+NextSMS transport tests use HTTP fixtures only. No live SMS has been sent; credentials, approved sender, migration and account-specific delivery verification are still required.

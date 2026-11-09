@@ -1,0 +1,81 @@
+<?php
+
+use App\Http\Middleware\ActiveAccount;
+use App\Modules\Administration\AdminController;
+use App\Modules\Catalog\CatalogController;
+use App\Modules\Checkout\CheckoutController;
+use App\Modules\Customers\AddressController;
+use App\Modules\Delivery\DeliveryController;
+use App\Modules\Engagement\ReviewController;
+use App\Modules\Engagement\SupportController;
+use App\Modules\Identity\AuthController;
+use App\Modules\Notifications\NotificationController;
+use App\Modules\Orders\OrderController;
+use App\Modules\Payments\WebhookController;
+use App\Modules\Promotions\CouponController;
+use App\Modules\Vendors\VendorController;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('v1')->name('api.v1.')->group(function (): void {
+    Route::post('webhooks/payments', WebhookController::class)->middleware('throttle:webhooks')->name('payments.webhook');
+    Route::middleware('throttle:api')->group(function (): void {
+        Route::get('openapi.json', fn () => response()->file(base_path('docs/openapi.json')))->name('openapi');
+        Route::post('auth/register', [AuthController::class, 'register'])->middleware('throttle:authentication')->name('auth.register');
+        Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:authentication')->name('auth.login');
+        Route::get('locations', [CatalogController::class, 'discovery'])->name('locations.index');
+        Route::get('locations/{location}', [CatalogController::class, 'location'])->name('locations.show');
+        Route::get('categories', [CatalogController::class, 'categories'])->name('categories.index');
+        Route::get('locations/{location}/products', [CatalogController::class, 'products'])->name('products.index');
+        Route::get('vendors/{vendor}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+        Route::middleware(['auth:sanctum', ActiveAccount::class])->group(function (): void {
+            Route::get('auth/me', [AuthController::class, 'me'])->name('auth.me');
+            Route::patch('auth/me', [AuthController::class, 'update'])->name('auth.update');
+            Route::post('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+            Route::apiResource('addresses', AddressController::class)->except('show');
+            Route::get('cart', [CheckoutController::class, 'cart'])->name('cart.show');
+            Route::post('cart/quote', [CheckoutController::class, 'quote'])->name('cart.quote');
+            Route::put('cart/items', [CheckoutController::class, 'item'])->name('cart.items');
+            Route::post('checkout', [CheckoutController::class, 'store'])->middleware('throttle:checkout')->name('checkout');
+            Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+            Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+            Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+            Route::post('orders/{order}/refund', [OrderController::class, 'refund'])->name('orders.refund');
+            Route::post('orders/{order}/review', [ReviewController::class, 'store'])->name('reviews.store');
+            Route::get('vendor/orders', [OrderController::class, 'vendor'])->name('vendor.orders');
+            Route::patch('vendor/orders/{order}', [OrderController::class, 'update'])->name('vendor.orders.update');
+            Route::post('vendor/orders/{order}/cash', [OrderController::class, 'cash'])->name('vendor.orders.cash');
+            Route::get('vendor/businesses', [VendorController::class, 'index'])->name('vendors.mine');
+            Route::post('vendor/businesses', [VendorController::class, 'store'])->name('vendors.apply');
+            Route::post('vendor/businesses/{vendor}/locations', [VendorController::class, 'location'])->name('locations.store');
+            Route::put('vendor/businesses/{vendor}/locations/{location}', [VendorController::class, 'location'])->name('locations.update');
+            Route::post('vendor/locations/{location}/products', [CatalogController::class, 'save'])->name('products.store');
+            Route::get('vendor/locations/{location}/products', [CatalogController::class, 'ownProducts'])->name('products.mine');
+            Route::put('vendor/locations/{location}/products/{product}', [CatalogController::class, 'save'])->name('products.update');
+            Route::get('vendor/businesses/{vendor}/coupons', [CouponController::class, 'index'])->name('coupons.index');
+            Route::post('vendor/businesses/{vendor}/coupons', [CouponController::class, 'store'])->name('coupons.store');
+            Route::get('rider/deliveries', [DeliveryController::class, 'index'])->name('deliveries.index');
+            Route::patch('rider/deliveries/{delivery}', [DeliveryController::class, 'update'])->name('deliveries.update');
+            Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+            Route::patch('notifications/{notification}', [NotificationController::class, 'update'])->name('notifications.update');
+            Route::get('support/tickets', [SupportController::class, 'index'])->name('support.index');
+            Route::post('support/tickets', [SupportController::class, 'store'])->name('support.store');
+            Route::get('support/tickets/{ticket}', [SupportController::class, 'show'])->name('support.show');
+            Route::post('support/tickets/{ticket}/messages', [SupportController::class, 'message'])->name('support.message');
+            Route::post('support/tickets/{ticket}/close', [SupportController::class, 'close'])->name('support.close');
+            Route::prefix('admin')->middleware('can:administer')->group(function (): void {
+                Route::get('vendors', [AdminController::class, 'vendors'])->name('admin.vendors');
+                Route::patch('vendors/{vendor}', [AdminController::class, 'approve'])->name('admin.vendors.review');
+                Route::post('users/{user}/roles', [AdminController::class, 'role'])->name('admin.roles');
+                Route::post('users/{user}/rider', [AdminController::class, 'rider'])->name('admin.riders');
+                Route::post('deliveries/{delivery}/assignment', [AdminController::class, 'assign'])->name('admin.deliveries.assign');
+                Route::get('refunds', [AdminController::class, 'refunds'])->name('admin.refunds.index');
+                Route::post('refunds/{refund}/approve', [AdminController::class, 'refund'])->name('admin.refunds.approve');
+                Route::get('settlements', [AdminController::class, 'settlements'])->name('admin.settlements.index');
+                Route::post('vendors/{vendor}/settlements', [AdminController::class, 'prepare'])->name('admin.settlements.prepare');
+                Route::post('settlements/{settlement}/paid', [AdminController::class, 'paid'])->name('admin.settlements.paid');
+                Route::post('settlements/{settlement}/void', [AdminController::class, 'void'])->name('admin.settlements.void');
+                Route::get('audit', [AdminController::class, 'audit'])->name('admin.audit');
+            });
+        });
+    });
+});

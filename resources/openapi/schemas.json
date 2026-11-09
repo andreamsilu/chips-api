@@ -1,0 +1,2770 @@
+{
+  "Error": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "errors": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      }
+    },
+    "required": [
+      "message"
+    ]
+  },
+  "Message": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "required": [
+      "message"
+    ]
+  },
+  "Register": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "password": {
+        "type": "string",
+        "minLength": 12,
+        "writeOnly": true
+      },
+      "password_confirmation": {
+        "type": "string",
+        "writeOnly": true
+      },
+      "phone": {
+        "type": "string",
+        "pattern": "^\\+255[67][0-9]{8}$"
+      }
+    },
+    "required": [
+      "name",
+      "email",
+      "password",
+      "password_confirmation"
+    ]
+  },
+  "Login": {
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "password": {
+        "type": "string",
+        "writeOnly": true
+      },
+      "device_name": {
+        "type": "string",
+        "maxLength": 100
+      }
+    },
+    "required": [
+      "email",
+      "password",
+      "device_name"
+    ]
+  },
+  "User": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "phone": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 20
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "roles": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "customer",
+            "vendor",
+            "rider",
+            "support",
+            "admin"
+          ]
+        }
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "email",
+      "phone",
+      "roles"
+    ]
+  },
+  "UserResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/User"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "TokenResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "token_type": {
+            "type": "string",
+            "enum": [
+              "Bearer"
+            ]
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "token",
+          "token_type",
+          "expires_at",
+          "user"
+        ]
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "AddressInput": {
+    "type": "object",
+    "properties": {
+      "label": {
+        "type": "string",
+        "maxLength": 80
+      },
+      "details": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      }
+    },
+    "required": [
+      "label",
+      "details",
+      "latitude",
+      "longitude"
+    ]
+  },
+  "Address": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "label": {
+        "type": "string",
+        "maxLength": 80
+      },
+      "details": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      }
+    },
+    "required": [
+      "id",
+      "label",
+      "details",
+      "latitude",
+      "longitude"
+    ]
+  },
+  "AddressResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Address"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "AddressList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Address"
+        }
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "CartItemInput": {
+    "type": "object",
+    "properties": {
+      "product_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "quantity": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 20
+      },
+      "instructions": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "product_id",
+      "quantity"
+    ]
+  },
+  "Cart": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "vendor_location_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "string",
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+            },
+            "quantity": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            },
+            "instructions": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "product": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+                      "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+                    },
+                    "name": {
+                      "type": "string",
+                      "maxLength": 160
+                    },
+                    "price": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0,
+                      "description": "Integer Tanzanian shillings (TZS)."
+                    },
+                    "available": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "available"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "product_id",
+            "quantity",
+            "instructions",
+            "product"
+          ]
+        }
+      }
+    },
+    "required": [
+      "id",
+      "version",
+      "vendor_location_id",
+      "items"
+    ]
+  },
+  "CartResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Cart"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "Checkout": {
+    "type": "object",
+    "properties": {
+      "cart_version": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "fulfilment": {
+        "type": "string",
+        "enum": [
+          "delivery",
+          "pickup"
+        ]
+      },
+      "payment_method": {
+        "type": "string",
+        "enum": [
+          "mpesa",
+          "tigo_pesa",
+          "airtel_money",
+          "cash"
+        ]
+      },
+      "phone": {
+        "type": "string",
+        "pattern": "^\\+255[67][0-9]{8}$"
+      },
+      "address_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "coupon": {
+        "type": "string",
+        "maxLength": 40
+      },
+      "expected_total": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "required": [
+      "cart_version",
+      "fulfilment",
+      "payment_method"
+    ],
+    "description": "Delivery requires address_id and a mobile-money method. Mobile money requires phone. Cash is pickup only. Version must match the latest cart response. Never submit prices, totals, statuses or commissions."
+  },
+  "Order": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "vendor_location_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "fulfilment": {
+        "type": "string",
+        "enum": [
+          "delivery",
+          "pickup"
+        ]
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "awaiting_payment",
+          "confirmed",
+          "accepted",
+          "preparing",
+          "ready",
+          "out_for_delivery",
+          "completed",
+          "delivered",
+          "cancelled",
+          "rejected"
+        ]
+      },
+      "payment_method": {
+        "type": "string",
+        "enum": [
+          "mpesa",
+          "tigo_pesa",
+          "airtel_money",
+          "cash"
+        ]
+      },
+      "payment_status": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "verified",
+          "failed",
+          "refund_pending",
+          "refunded"
+        ]
+      },
+      "currency": {
+        "type": "string",
+        "enum": [
+          "TZS"
+        ]
+      },
+      "subtotal": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "description": "Integer Tanzanian shillings (TZS)."
+      },
+      "discount": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "description": "Integer Tanzanian shillings (TZS)."
+      },
+      "delivery_fee": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "description": "Integer Tanzanian shillings (TZS)."
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "description": "Integer Tanzanian shillings (TZS)."
+      },
+      "address": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "details": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        },
+        "required": [
+          "details",
+          "latitude",
+          "longitude"
+        ]
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "string",
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+            },
+            "name": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "unit_price": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0,
+              "description": "Integer Tanzanian shillings (TZS)."
+            },
+            "quantity": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            },
+            "line_total": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0,
+              "description": "Integer Tanzanian shillings (TZS)."
+            },
+            "instructions": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "product_id",
+            "name",
+            "unit_price",
+            "quantity",
+            "line_total",
+            "instructions"
+          ]
+        }
+      },
+      "history": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "from_status": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "to_status": {
+              "type": "string",
+              "maxLength": 30
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "from_status",
+            "to_status",
+            "reason",
+            "created_at"
+          ]
+        }
+      },
+      "payment": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+                "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+              },
+              "status": {
+                "type": "string",
+                "maxLength": 30
+              },
+              "verified_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "verified_at"
+            ]
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "refund": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/Refund"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivery": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/Delivery"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "is_customer_order": {
+        "type": "boolean"
+      },
+      "vendor_name": {
+        "type": "string"
+      },
+      "commission": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Saved commission; included in the vendor namespace only."
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "vendor_location_id",
+      "fulfilment",
+      "status",
+      "payment_method",
+      "payment_status",
+      "currency",
+      "subtotal",
+      "discount",
+      "delivery_fee",
+      "total",
+      "address",
+      "created_at"
+    ]
+  },
+  "OrderResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Order"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "Reason": {
+    "type": "object",
+    "properties": {
+      "reason": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "required": [
+      "reason"
+    ]
+  },
+  "OrderTransition": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": [
+          "accepted",
+          "preparing",
+          "ready",
+          "completed",
+          "rejected"
+        ]
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "required": [
+      "status"
+    ]
+  },
+  "CashCollection": {
+    "type": "object",
+    "properties": {
+      "cash_received": {
+        "const": true,
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "cash_received"
+    ]
+  },
+  "VendorApplication": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      }
+    },
+    "required": [
+      "name"
+    ]
+  },
+  "Vendor": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "approved",
+          "rejected",
+          "suspended"
+        ]
+      },
+      "commission_bps": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000
+      },
+      "locations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Location"
+        }
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "status",
+      "commission_bps"
+    ]
+  },
+  "VendorResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Vendor"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "LocationInput": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "address": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      },
+      "accepting_orders": {
+        "type": "boolean"
+      },
+      "delivery_enabled": {
+        "type": "boolean"
+      },
+      "pickup_enabled": {
+        "type": "boolean"
+      },
+      "delivery_radius_km": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      }
+    },
+    "required": [
+      "name",
+      "address",
+      "latitude",
+      "longitude",
+      "accepting_orders",
+      "delivery_enabled",
+      "pickup_enabled",
+      "delivery_radius_km"
+    ]
+  },
+  "Location": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "address": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      },
+      "accepting_orders": {
+        "type": "boolean"
+      },
+      "delivery_enabled": {
+        "type": "boolean"
+      },
+      "pickup_enabled": {
+        "type": "boolean"
+      },
+      "delivery_radius_km": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "distance_km": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "name",
+      "address",
+      "latitude",
+      "longitude",
+      "accepting_orders",
+      "delivery_enabled",
+      "pickup_enabled",
+      "delivery_radius_km"
+    ]
+  },
+  "LocationResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Location"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "Category": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 100
+      }
+    },
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "CategoryList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Category"
+        }
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "ProductInput": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "description": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 5000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "category_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "price": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "stock": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000000
+      },
+      "available": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "category_id",
+      "price",
+      "stock",
+      "available"
+    ]
+  },
+  "Product": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "vendor_location_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "description": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 5000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "category_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "price": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "stock": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000000
+      },
+      "available": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "id",
+      "vendor_location_id",
+      "name",
+      "description",
+      "category_id",
+      "price",
+      "stock",
+      "available"
+    ]
+  },
+  "ProductResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Product"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "CouponInput": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string",
+        "pattern": "^[A-Z0-9_-]{3,40}$"
+      },
+      "discount": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "minimum_subtotal": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "description": "Integer Tanzanian shillings (TZS)."
+      },
+      "usage_limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000000
+      },
+      "starts_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "code",
+      "discount",
+      "minimum_subtotal",
+      "usage_limit",
+      "starts_at",
+      "expires_at"
+    ]
+  },
+  "Coupon": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "code": {
+        "type": "string",
+        "pattern": "^[A-Z0-9_-]{3,40}$"
+      },
+      "discount": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "minimum_subtotal": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "description": "Integer Tanzanian shillings (TZS)."
+      },
+      "usage_limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000000
+      },
+      "starts_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "used": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "active": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "code",
+      "discount",
+      "minimum_subtotal",
+      "usage_limit",
+      "starts_at",
+      "expires_at",
+      "used",
+      "active"
+    ]
+  },
+  "CouponResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Coupon"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "ReviewInput": {
+    "type": "object",
+    "properties": {
+      "rating": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+      },
+      "comment": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 2000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "rating"
+    ]
+  },
+  "Review": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "rating": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+      },
+      "comment": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 2000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "rating",
+      "comment",
+      "created_at"
+    ]
+  },
+  "ReviewResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Review"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "TicketInput": {
+    "type": "object",
+    "properties": {
+      "subject": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "body": {
+        "type": "string",
+        "maxLength": 5000
+      },
+      "order_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "subject",
+      "body"
+    ]
+  },
+  "SupportTicket": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "subject": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "open",
+          "closed"
+        ]
+      },
+      "order_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "subject",
+      "status"
+    ]
+  },
+  "TicketResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/SupportTicket"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "SupportMessage": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "body": {
+        "type": "string",
+        "maxLength": 5000
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "body",
+      "created_at"
+    ]
+  },
+  "SupportMessageInput": {
+    "type": "object",
+    "properties": {
+      "body": {
+        "type": "string",
+        "maxLength": 5000
+      }
+    },
+    "required": [
+      "body"
+    ]
+  },
+  "SupportMessageResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/SupportMessage"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "TicketDetail": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/SupportTicket"
+      },
+      "messages": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupportMessage"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      }
+    },
+    "required": [
+      "data",
+      "messages"
+    ]
+  },
+  "Delivery": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "unassigned",
+          "assigned",
+          "picked_up",
+          "delivered"
+        ]
+      },
+      "picked_up_at": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivered_at": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "status"
+    ]
+  },
+  "AssignedDelivery": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "status": {
+        "type": "string",
+        "maxLength": 30
+      },
+      "destination": {
+        "type": "object"
+      },
+      "vendor_location_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "picked_up_at": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivered_at": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "order_id",
+      "status",
+      "destination",
+      "vendor_location_id",
+      "picked_up_at",
+      "delivered_at"
+    ]
+  },
+  "DeliveryResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AssignedDelivery"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "DeliveryTransition": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": [
+          "picked_up",
+          "delivered"
+        ]
+      }
+    },
+    "required": [
+      "status"
+    ]
+  },
+  "Assignment": {
+    "type": "object",
+    "properties": {
+      "rider_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      }
+    },
+    "required": [
+      "rider_id"
+    ]
+  },
+  "AssignmentResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+          },
+          "order_id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+          },
+          "rider_id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 30
+          }
+        },
+        "required": [
+          "id",
+          "order_id",
+          "rider_id",
+          "status"
+        ]
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "VendorApproval": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": [
+          "approved",
+          "rejected",
+          "suspended"
+        ]
+      },
+      "commission_bps": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000
+      }
+    },
+    "required": [
+      "status",
+      "commission_bps"
+    ]
+  },
+  "RoleGrant": {
+    "type": "object",
+    "properties": {
+      "role": {
+        "type": "string",
+        "enum": [
+          "customer",
+          "vendor",
+          "rider",
+          "support",
+          "admin"
+        ]
+      }
+    },
+    "required": [
+      "role"
+    ]
+  },
+  "RiderInput": {
+    "type": "object",
+    "properties": {
+      "vehicle": {
+        "type": "string",
+        "maxLength": 100
+      }
+    },
+    "required": [
+      "vehicle"
+    ]
+  },
+  "RiderResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+          },
+          "vehicle": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 20
+          }
+        },
+        "required": [
+          "id",
+          "vehicle",
+          "status"
+        ]
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "Refund": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "amount": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "description": "Integer Tanzanian shillings (TZS)."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "requested",
+          "approved",
+          "manual_required",
+          "failed",
+          "reversed",
+          "refunded"
+        ]
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "required": [
+      "id",
+      "amount",
+      "status",
+      "reason"
+    ]
+  },
+  "RefundResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Refund"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "RefundApproval": {
+    "type": "object",
+    "properties": {
+      "external_receipt": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "receipt_verified": {
+        "type": "boolean",
+        "const": true
+      }
+    },
+    "required": [],
+    "description": "Empty body approves an asynchronous Snippe payout when enabled and eligible; otherwise manual_required. For an already verified manual return, supply its receipt and receipt_verified=true. Pending provider payouts cannot be manually completed."
+  },
+  "Settlement": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "amount": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "description": "Integer Tanzanian shillings (TZS)."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "prepared",
+          "paid",
+          "voided"
+        ]
+      },
+      "external_reference": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 160
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "paid_at": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "amount",
+      "status"
+    ]
+  },
+  "SettlementResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/Settlement"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "SettlementReceipt": {
+    "type": "object",
+    "properties": {
+      "external_reference": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "transfer_verified": {
+        "type": "boolean",
+        "const": true
+      }
+    },
+    "required": [
+      "external_reference",
+      "transfer_verified"
+    ]
+  },
+  "Notification": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "maxLength": 36
+      },
+      "type": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "data": {
+        "type": "object"
+      },
+      "read_at": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "type",
+      "data",
+      "read_at",
+      "created_at"
+    ]
+  },
+  "Audit": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+        "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+      },
+      "action": {
+        "type": "string",
+        "maxLength": 80
+      },
+      "subject_type": {
+        "type": "string",
+        "maxLength": 80
+      },
+      "subject_id": {
+        "type": "string",
+        "maxLength": 80
+      },
+      "metadata": {
+        "type": "object"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "action",
+      "subject_type",
+      "subject_id",
+      "metadata",
+      "created_at"
+    ]
+  },
+  "SnippeEvent": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "payment.completed",
+          "payment.failed",
+          "payment.expired",
+          "payment.voided",
+          "payout.completed",
+          "payout.failed",
+          "payout.reversed"
+        ]
+      },
+      "api_version": {
+        "type": "string",
+        "enum": [
+          "2026-01-25"
+        ]
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "failed",
+              "voided",
+              "expired",
+              "reversed"
+            ]
+          },
+          "amount": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000000
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "TZS"
+                ]
+              }
+            },
+            "required": [
+              "value",
+              "currency"
+            ]
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "order_id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+                "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+              },
+              "refund_id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+                "example": "01K9N7T0W0ZQVADXX1W34XFZZZ"
+              }
+            },
+            "required": [
+              "order_id"
+            ]
+          },
+          "recipient": {
+            "type": "object",
+            "properties": {
+              "phone": {
+                "type": "string",
+                "maxLength": 20
+              }
+            },
+            "required": [
+              "phone"
+            ]
+          }
+        },
+        "required": [
+          "reference",
+          "status",
+          "amount",
+          "metadata"
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "type",
+      "api_version",
+      "data"
+    ]
+  },
+  "WebhookResponse": {
+    "type": "object",
+    "properties": {
+      "received": {
+        "type": "boolean",
+        "const": true
+      }
+    },
+    "required": [
+      "received"
+    ]
+  },
+  "OpenApi": {
+    "type": "object",
+    "required": [
+      "openapi",
+      "info",
+      "paths",
+      "components"
+    ]
+  },
+  "OrderPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Order"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "VendorPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Vendor"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "LocationPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Location"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "ProductPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Product"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "CouponPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Coupon"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "ReviewPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Review"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "SupportTicketPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SupportTicket"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "AssignedDeliveryPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AssignedDelivery"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "NotificationPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Notification"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "RefundPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Refund"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "SettlementPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Settlement"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "AuditPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Audit"
+        }
+      },
+      "current_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "last_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "links": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "data"
+    ]
+  },
+  "QuoteResponse": {
+    "type": "object",
+    "required": [
+      "data"
+    ],
+    "properties": {
+      "data": {
+        "type": "object",
+        "required": [
+          "cart_version",
+          "subtotal",
+          "discount",
+          "delivery_fee",
+          "total",
+          "currency",
+          "payment_available"
+        ],
+        "properties": {
+          "cart_version": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "integer"
+          },
+          "discount": {
+            "type": "integer"
+          },
+          "delivery_fee": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "currency": {
+            "const": "TZS"
+          },
+          "payment_available": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "ProfileInput": {
+    "type": "object",
+    "required": [
+      "name"
+    ],
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      }
+    }
+  }
+}
