@@ -36,6 +36,7 @@ verify:
   services:
     - name: mysql:8.0
       alias: mysql
+      command: ["--log-bin-trust-function-creators=1"]
     - name: redis:7-alpine
       alias: redis
   variables:
