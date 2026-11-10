@@ -18,7 +18,7 @@ if [[ "$latest" != "$CI_COMMIT_SHA" ]]; then
   exit 0
 fi
 
-sha256sum --check release.tar.gz.sha256
+sha256sum -c release.tar.gz.sha256
 remote="$DEPLOY_USER@$DEPLOY_HOST"
 incoming="$DEPLOY_PATH/.deploy/incoming-$CI_COMMIT_SHA"
 ssh_options=(-p "$DEPLOY_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 -o ServerAliveInterval=15)
