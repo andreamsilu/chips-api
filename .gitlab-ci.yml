@@ -129,7 +129,14 @@ deploy_production:
         exit 1
       fi
     - install -d -m 700 ~/.ssh
-    - install -m 600 "$SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
+    - |
+      tr -d '\r' < "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+      printf '\n' >> ~/.ssh/id_ed25519
+      chmod 600 ~/.ssh/id_ed25519
+      if ! ssh-keygen -y -P '' -f ~/.ssh/id_ed25519 >/dev/null 2>&1; then
+        printf '%s\n' 'SSH_PRIVATE_KEY is invalid or encrypted. Supply the complete unencrypted OpenSSH private key as a File variable.' >&2
+        exit 1
+      fi
     - install -m 600 "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
   script:
     - bash resources/ci/deploy-client.sh
