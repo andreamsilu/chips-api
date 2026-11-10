@@ -5,6 +5,7 @@ namespace App\Modules\Identity;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Modules\Administration\AdminAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,6 +71,6 @@ final class AuthController extends Controller
 
     private function profile(User $user): array
     {
-        return ['id' => $user->public_id, 'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone, 'roles' => $user->roles()->pluck('name')];
+        return ['id' => $user->public_id, 'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone, 'roles' => $user->roles()->pluck('name'), 'permissions' => AdminAccess::permissions($user)];
     }
 }

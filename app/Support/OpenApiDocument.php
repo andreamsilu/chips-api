@@ -33,7 +33,7 @@ final class OpenApiDocument
             }
             $operation = ['summary' => $metadata['summary'], 'tags' => [$metadata['tag']], 'parameters' => $parameters, 'security' => in_array('auth:sanctum', $route->gatherMiddleware(), true) ? [['bearerAuth' => []]] : [], 'responses' => []];
             if (isset($metadata['body'])) {
-                $operation['requestBody'] = ['required' => ! ($metadata['optional_body'] ?? false), 'content' => ['application/json' => ['schema' => ['$ref' => '#/components/schemas/'.$metadata['body']]]]];
+                $operation['requestBody'] = ['required' => ! ($metadata['optional_body'] ?? false), 'content' => [($metadata['request_media'] ?? 'application/json') => ['schema' => ['$ref' => '#/components/schemas/'.$metadata['body']]]]];
             }
             if ($name === 'checkout') {
                 $operation['parameters'][] = ['name' => 'Idempotency-Key', 'in' => 'header', 'required' => true, 'schema' => ['type' => 'string', 'minLength' => 8, 'maxLength' => 100, 'pattern' => '^[A-Za-z0-9_-]+$']];
@@ -45,8 +45,8 @@ final class OpenApiDocument
                 $operation['description'] = 'Snippe 2026-01-25 envelope. Requires hex HMAC-SHA256(secret, timestamp + dot + exact raw body); timestamp tolerance 300 seconds. Subscribe to payment.completed/failed/expired/voided and payout.completed/failed/reversed. Retries deduplicate by envelope id.';
             }
             foreach ($metadata['statuses'] ?? [200] as $status) {
-                $schema = ['$ref' => '#/components/schemas/'.($metadata['response'] ?? 'Message')];
-                $operation['responses'][(string) $status] = ['description' => $status === 201 ? 'Created' : ($status === 202 ? 'Requested; financial completion is asynchronous' : 'Successful response'), 'content' => ['application/json' => ['schema' => $schema]]];
+                $schema = ($metadata['binary'] ?? false) ? ['type' => 'string', 'format' => 'binary'] : ['$ref' => '#/components/schemas/'.($metadata['response'] ?? 'Message')];
+                $operation['responses'][(string) $status] = ['description' => $status === 201 ? 'Created' : ($status === 202 ? 'Requested; financial completion is asynchronous' : 'Successful response'), 'content' => [($metadata['content_type'] ?? 'application/json') => ['schema' => $schema]]];
             }
             foreach ([401 => 'Unauthenticated or invalid signature', 403 => 'Insufficient permission', 404 => 'Resource absent or outside your scope', 409 => 'State, stock, reference or idempotency conflict', 422 => 'Validation failed', 429 => 'Rate limit exceeded', 503 => 'Required service is not configured'] as $status => $description) {
                 $operation['responses'][(string) $status] = ['description' => $description, 'content' => ['application/json' => ['schema' => ['$ref' => '#/components/schemas/Error']]]];

@@ -80,3 +80,31 @@ The user confirmed **Snippe (snippe.sh)** during implementation. The concrete ad
 ## NextSMS delivery records
 
 Additive migration: outbox_messages has zero or one sms_deliveries record (unique outbox_message_id foreign key). Records use the event ULID as public reference, encrypted recipient/body, a status/recovery index and unique provider message ID. The notification publisher stages this record transactionally before marking the event published. A separate notifications-queue job atomically claims queued records before the external request. Accepted, rejected and uncertain states prevent duplicate processing; the existing scheduler recovers undispatched queued records. Existing in-app/Reverb notifications continue independently.
+
+## Administration expansion (2026-11-10)
+
+Administrative collections share validated query controls: page 1–10,000, per_page 1–100, literal search, an allowlist of sort columns/directions, and inclusive East Africa dates translated to UTC ranges. Search/filter predicates run before pagination, with stable ID tie-breakers. User records expose public ULIDs; provider request payloads and private storage paths are explicitly excluded by AdminData. Nested order/rider/customer relationships are eager loaded.
+
+The existing flat paginator contract is retained for old clients. New operations live in the Administration module and reuse the existing order/refund/payment/ledger services. AdminData is an explicit response serializer; it avoids exposing whole models while preserving the established JsonResponse/paginator shape.
+
+Financial summaries use immutable posted ledger entries, including refund and refund-reversal entries. Captures and refunds are joined through the unique platform_commission entry per order/kind so gross amounts are not multiplied by the other ledger accounts. Reports support at most 366 days; exports stream at most 100,000 entries in chunks and bind a maximum ID before streaming. Read-only overview aggregates have a 20-second cache.
+
+### Additive schema
+
+```mermaid
+erDiagram
+    users ||--o| admin_access_profiles : has
+    users ||--o{ admin_permission_grants : receives
+    users ||--o{ system_settings : updates
+    vendors ||--o{ vendor_documents : submits
+    users ||--o{ vendor_documents : reviews
+    campaigns ||--o{ coupons : groups
+    vendors ||--o{ coupons : funds
+    vendor_locations ||--o{ products : stocks
+```
+
+The migration adds nullable product image paths, rider availability (true preserves existing eligibility), campaign associations and indexes supporting global date/status/ledger queries. It does not modify financial snapshots or rewrite existing transaction history. Newly created or restricted access profiles are enforced through AdminAccess middleware; absence of a profile preserves the existing unrestricted administrator behavior. Role removal, suspensions and permission changes are serialized using the administrator role row, and at least one unrestricted active administrator must remain.
+
+Only delivery_base_fee, delivery_per_km, support_email, support_phone and support_hours can be changed through settings. Versions reject stale writes; secret/provider settings remain environment-managed. Delivery pricing changes apply only to future quotes/orders. Stock updates require expected_stock and compare under the product row lock before saving.
+
+Product images are stored privately with generated names and served through controlled image routes. Verification documents are private, downloadable only by authorized administrators or members of the owning vendor. SVG/HTML/executable uploads are rejected. Verification reviews and exports are audited; uploaded bytes, passwords and provider secrets are never recorded in audit metadata.

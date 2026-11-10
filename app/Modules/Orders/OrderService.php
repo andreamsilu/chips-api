@@ -58,6 +58,27 @@ final class OrderService
         }, 3);
     }
 
+    public function cancelByAdministrator(Order $input, User $actor, string $status, string $reason): Order
+    {
+        abort_unless($actor->hasRole('admin'), 403);
+
+        return DB::transaction(function () use ($input, $actor, $status, $reason): Order {
+            $order = Order::whereKey($input->id)->lockForUpdate()->firstOrFail();
+            Domain::require(in_array($status, ['cancelled', 'rejected'], true), 'Unsupported administrative transition.');
+            if ($order->status === $status) {
+                return $order;
+            }
+            Domain::require(in_array($order->status, ['awaiting_payment', 'confirmed'], true), 'Order fulfilment has already started.');
+            $this->releaseStock($order);
+            if ($order->payment_status === 'verified') {
+                $this->requestRefund($order, $actor, $reason);
+            }
+            Domain::transition($order, $status, $actor, $reason);
+
+            return $order;
+        }, 3);
+    }
+
     public function collectCash(Order $input, User $actor): Order
     {
         return DB::transaction(function () use ($input, $actor): Order {

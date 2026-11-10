@@ -382,7 +382,76 @@
     "statuses": [
       200
     ],
-    "paginate": true
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "read",
+            "unread"
+          ]
+        }
+      }
+    ]
   },
   "notifications.update": {
     "summary": "Mark your notification as read",
@@ -453,11 +522,87 @@
   "admin.vendors": {
     "summary": "List businesses for administrative review",
     "tag": "Administration",
-    "response": "VendorPage",
+    "response": "AdminVendorPage",
     "statuses": [
       200
     ],
-    "paginate": true
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "name",
+            "status",
+            "commission_bps"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "suspended"
+          ]
+        }
+      }
+    ]
   },
   "admin.vendors.review": {
     "summary": "Approve reject or suspend a vendor",
@@ -502,11 +647,96 @@
   "admin.refunds.index": {
     "summary": "List refunds for administrative review",
     "tag": "Administration",
-    "response": "RefundPage",
+    "response": "AdminRefundPage",
     "statuses": [
       200
     ],
-    "paginate": true
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "amount",
+            "status"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "requested",
+            "approved",
+            "manual_required",
+            "refunded",
+            "failed",
+            "reversed"
+          ]
+        }
+      },
+      {
+        "name": "order_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
   },
   "admin.refunds.approve": {
     "summary": "Approve a refund or attest a manual return receipt",
@@ -522,11 +752,93 @@
   "admin.settlements.index": {
     "summary": "List settlement batches",
     "tag": "Finance",
-    "response": "SettlementPage",
+    "response": "AdminSettlementPage",
     "statuses": [
       200
     ],
-    "paginate": true
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "amount",
+            "status"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "prepared",
+            "paid",
+            "voided"
+          ]
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
   },
   "admin.settlements.prepare": {
     "summary": "Prepare an eligible vendor settlement",
@@ -559,11 +871,105 @@
   "admin.audit": {
     "summary": "Read immutable audit records",
     "tag": "Administration",
-    "response": "AuditPage",
+    "response": "AdminAuditPage",
     "statuses": [
       200
     ],
-    "paginate": true
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "action",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 80
+        }
+      },
+      {
+        "name": "subject_type",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 80
+        }
+      },
+      {
+        "name": "subject_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "actor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "description": "Public user ULID, not the internal numeric actor ID."
+      }
+    ]
   },
   "auth.update": {
     "summary": "Update your profile name",
@@ -587,5 +993,2396 @@
     "tag": "Checkout",
     "body": "Checkout",
     "response": "QuoteResponse"
+  },
+  "admin.dashboard": {
+    "summary": "GET dashboard — administrator access required",
+    "tag": "Administration",
+    "response": "AdminDashboardResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "query": [
+      {
+        "name": "date_from",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    ]
+  },
+  "admin.customers.index": {
+    "summary": "GET customers",
+    "tag": "Administration",
+    "response": "AdminUserPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "name",
+            "email"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "active",
+            "suspended"
+          ]
+        }
+      },
+      {
+        "name": "role",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "customer",
+            "vendor",
+            "rider",
+            "support",
+            "admin"
+          ]
+        }
+      }
+    ]
+  },
+  "admin.customers.show": {
+    "summary": "GET customers/{user} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminUserResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.customers.update": {
+    "summary": "PATCH customers/{user} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminUserResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminUserUpdate"
+  },
+  "admin.customers.orders": {
+    "summary": "GET customers/{user}/orders",
+    "tag": "Administration",
+    "response": "AdminOrderPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "total",
+            "status"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "awaiting_payment",
+            "confirmed",
+            "accepted",
+            "preparing",
+            "ready",
+            "out_for_delivery",
+            "completed",
+            "delivered",
+            "cancelled",
+            "rejected"
+          ]
+        }
+      },
+      {
+        "name": "payment_status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "pending",
+            "verified",
+            "failed",
+            "expired",
+            "refund_pending",
+            "refunded"
+          ]
+        }
+      },
+      {
+        "name": "fulfilment",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "delivery",
+            "pickup"
+          ]
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "customer_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "rider_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
+  },
+  "admin.users.index": {
+    "summary": "GET users",
+    "tag": "Administration",
+    "response": "AdminUserPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "name",
+            "email"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "active",
+            "suspended"
+          ]
+        }
+      },
+      {
+        "name": "role",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "customer",
+            "vendor",
+            "rider",
+            "support",
+            "admin"
+          ]
+        }
+      }
+    ]
+  },
+  "admin.users.store": {
+    "summary": "POST users — administrator access required",
+    "tag": "Administration",
+    "response": "AdminUserResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "AdminUserCreate"
+  },
+  "admin.users.show": {
+    "summary": "GET users/{user} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminUserResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.users.update": {
+    "summary": "PATCH users/{user} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminUserResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminUserUpdate"
+  },
+  "admin.users.roles.update": {
+    "summary": "PUT users/{user}/roles — administrator access required",
+    "tag": "Administration",
+    "response": "AdminUserResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminRolesUpdate"
+  },
+  "admin.users.permissions": {
+    "summary": "PUT users/{user}/permissions — administrator access required",
+    "tag": "Administration",
+    "response": "AdminPermissionsResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminPermissionsUpdate"
+  },
+  "admin.users.password": {
+    "summary": "POST users/{user}/password — administrator access required",
+    "tag": "Administration",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminPasswordUpdate"
+  },
+  "admin.roles.index": {
+    "summary": "GET roles — administrator access required",
+    "tag": "Administration",
+    "response": "AdminRoleCatalogueResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.orders.index": {
+    "summary": "GET orders",
+    "tag": "Administration",
+    "response": "AdminOrderPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "total",
+            "status"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "awaiting_payment",
+            "confirmed",
+            "accepted",
+            "preparing",
+            "ready",
+            "out_for_delivery",
+            "completed",
+            "delivered",
+            "cancelled",
+            "rejected"
+          ]
+        }
+      },
+      {
+        "name": "payment_status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "pending",
+            "verified",
+            "failed",
+            "expired",
+            "refund_pending",
+            "refunded"
+          ]
+        }
+      },
+      {
+        "name": "fulfilment",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "delivery",
+            "pickup"
+          ]
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "customer_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "rider_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
+  },
+  "admin.orders.show": {
+    "summary": "GET orders/{order} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminOrderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.orders.cancel": {
+    "summary": "POST orders/{order}/cancellation — administrator access required",
+    "tag": "Administration",
+    "response": "AdminOrderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminCancellation"
+  },
+  "admin.orders.refund": {
+    "summary": "POST orders/{order}/refund — administrator access required",
+    "tag": "Administration",
+    "response": "AdminRefundResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminRefundRequest"
+  },
+  "admin.payments.index": {
+    "summary": "GET payments",
+    "tag": "Administration",
+    "response": "AdminPaymentPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "amount",
+            "verified_at",
+            "status"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "pending",
+            "verified",
+            "failed",
+            "expired",
+            "refund_pending",
+            "refunded"
+          ]
+        }
+      },
+      {
+        "name": "order_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
+  },
+  "admin.payments.show": {
+    "summary": "GET payments/{payment} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminPaymentResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.payments.events": {
+    "summary": "GET payments/{payment}/events",
+    "tag": "Administration",
+    "response": "AdminEventPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id"
+          ],
+          "default": "created_at"
+        }
+      }
+    ]
+  },
+  "admin.payments.reconcile": {
+    "summary": "POST payments/{payment}/reconcile — administrator access required",
+    "tag": "Administration",
+    "response": "Message",
+    "statuses": [
+      202
+    ],
+    "paginate": false
+  },
+  "admin.riders.index": {
+    "summary": "GET riders",
+    "tag": "Administration",
+    "response": "AdminRiderPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "vehicle",
+            "status"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "suspended"
+          ]
+        }
+      },
+      {
+        "name": "available",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ]
+  },
+  "admin.riders.show": {
+    "summary": "GET riders/{rider} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminRiderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.riders.update": {
+    "summary": "PATCH riders/{rider} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminRiderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminRiderUpdate"
+  },
+  "admin.riders.deliveries": {
+    "summary": "GET riders/{rider}/deliveries",
+    "tag": "Administration",
+    "response": "AdminDeliveryPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "unassigned",
+            "assigned",
+            "picked_up",
+            "delivered"
+          ]
+        }
+      },
+      {
+        "name": "rider_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "order_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
+  },
+  "admin.deliveries.index": {
+    "summary": "GET deliveries",
+    "tag": "Administration",
+    "response": "AdminDeliveryPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "unassigned",
+            "assigned",
+            "picked_up",
+            "delivered"
+          ]
+        }
+      },
+      {
+        "name": "rider_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "order_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
+  },
+  "admin.vendors.show": {
+    "summary": "GET vendors/{vendor} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminVendorResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.vendors.locations.index": {
+    "summary": "GET vendors/{vendor}/locations",
+    "tag": "Administration",
+    "response": "AdminLocationPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "name"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "accepting_orders",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "delivery_enabled",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "pickup_enabled",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ]
+  },
+  "admin.vendors.locations.store": {
+    "summary": "POST vendors/{vendor}/locations — administrator access required",
+    "tag": "Administration",
+    "response": "AdminLocationResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "AdminLocationCreate"
+  },
+  "admin.locations.index": {
+    "summary": "GET locations",
+    "tag": "Administration",
+    "response": "AdminLocationPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "name"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "accepting_orders",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "delivery_enabled",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "pickup_enabled",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ]
+  },
+  "admin.locations.update": {
+    "summary": "PATCH locations/{location} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminLocationResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminLocationUpdate"
+  },
+  "admin.vendors.documents.index": {
+    "summary": "GET vendors/{vendor}/documents — administrator access required",
+    "tag": "Administration",
+    "response": "AdminDocumentPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  "admin.vendors.documents.store": {
+    "summary": "POST vendors/{vendor}/documents — administrator access required",
+    "tag": "Administration",
+    "response": "AdminDocumentResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "request_media": "multipart/form-data",
+    "body": "AdminDocumentUpload"
+  },
+  "admin.vendors.documents.download": {
+    "summary": "GET vendors/{vendor}/documents/{document}/download — administrator access required",
+    "tag": "Administration",
+    "response": "AdminVendorResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "binary": true,
+    "content_type": "application/octet-stream"
+  },
+  "admin.vendors.documents.review": {
+    "summary": "PATCH vendors/{vendor}/documents/{document} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminDocumentResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminDocumentReview"
+  },
+  "admin.categories.index": {
+    "summary": "GET categories",
+    "tag": "Administration",
+    "response": "AdminCategoryPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "name"
+          ],
+          "default": "created_at"
+        }
+      }
+    ]
+  },
+  "admin.categories.store": {
+    "summary": "POST categories — administrator access required",
+    "tag": "Administration",
+    "response": "AdminCategoryResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "AdminCategorySave"
+  },
+  "admin.categories.update": {
+    "summary": "PATCH categories/{category} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminCategoryResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminCategorySave"
+  },
+  "admin.categories.delete": {
+    "summary": "DELETE categories/{category} — administrator access required",
+    "tag": "Administration",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.products.index": {
+    "summary": "GET products",
+    "tag": "Administration",
+    "response": "AdminProductPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "name",
+            "price",
+            "stock"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "vendor_location_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "category_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "available",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ]
+  },
+  "admin.products.show": {
+    "summary": "GET products/{product} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminProductResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.products.store": {
+    "summary": "POST products — administrator access required",
+    "tag": "Administration",
+    "response": "AdminProductResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "AdminProductCreate"
+  },
+  "admin.products.update": {
+    "summary": "PATCH products/{product} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminProductResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminProductUpdate"
+  },
+  "admin.products.delete": {
+    "summary": "DELETE products/{product} — administrator access required",
+    "tag": "Administration",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.products.image.store": {
+    "summary": "POST products/{product}/image — administrator access required",
+    "tag": "Administration",
+    "response": "AdminProductResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "request_media": "multipart/form-data",
+    "body": "AdminImageUpload"
+  },
+  "admin.products.image": {
+    "summary": "GET products/{product}/image — administrator access required",
+    "tag": "Administration",
+    "response": "AdminProductResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "binary": true,
+    "content_type": "image/*"
+  },
+  "admin.coupons.index": {
+    "summary": "GET coupons",
+    "tag": "Administration",
+    "response": "AdminCouponPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "code",
+            "discount"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "campaign_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "active",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ]
+  },
+  "admin.coupons.show": {
+    "summary": "GET coupons/{coupon} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminCouponResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.coupons.store": {
+    "summary": "POST coupons — administrator access required",
+    "tag": "Administration",
+    "response": "AdminCouponResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "AdminCouponCreate"
+  },
+  "admin.coupons.update": {
+    "summary": "PATCH coupons/{coupon} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminCouponResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminCouponUpdate"
+  },
+  "admin.coupons.delete": {
+    "summary": "DELETE coupons/{coupon} — administrator access required",
+    "tag": "Administration",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.campaigns.index": {
+    "summary": "GET campaigns",
+    "tag": "Administration",
+    "response": "AdminCampaignPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "name"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "active",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ]
+  },
+  "admin.campaigns.show": {
+    "summary": "GET campaigns/{campaign} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminCampaignResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.campaigns.store": {
+    "summary": "POST campaigns — administrator access required",
+    "tag": "Administration",
+    "response": "AdminCampaignResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "AdminCampaignCreate"
+  },
+  "admin.campaigns.update": {
+    "summary": "PATCH campaigns/{campaign} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminCampaignResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminCampaignUpdate"
+  },
+  "admin.finance.summary": {
+    "summary": "GET finance/summary — administrator access required",
+    "tag": "Administration",
+    "response": "AdminFinanceResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "query": [
+      {
+        "name": "date_from",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
+  },
+  "admin.finance.ledger": {
+    "summary": "GET finance/ledger",
+    "tag": "Administration",
+    "response": "AdminLedgerPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "amount"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "order_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "account",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "provider_clearing",
+            "vendor_payable",
+            "platform_commission",
+            "delivery_revenue"
+          ]
+        }
+      },
+      {
+        "name": "kind",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "capture",
+            "refund",
+            "refund_reversed",
+            "manual_refund"
+          ]
+        }
+      }
+    ]
+  },
+  "admin.finance.export": {
+    "summary": "GET finance/export — administrator access required",
+    "tag": "Administration",
+    "response": "AdminFinanceResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "query": [
+      {
+        "name": "date_from",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ],
+    "binary": true,
+    "content_type": "text/csv"
+  },
+  "admin.settlements.show": {
+    "summary": "GET settlements/{settlement} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminSettlementResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.settlements.entries": {
+    "summary": "GET settlements/{settlement}/entries",
+    "tag": "Administration",
+    "response": "AdminLedgerPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id",
+            "amount"
+          ],
+          "default": "created_at"
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "order_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "account",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "provider_clearing",
+            "vendor_payable",
+            "platform_commission",
+            "delivery_revenue"
+          ]
+        }
+      },
+      {
+        "name": "kind",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "capture",
+            "refund",
+            "refund_reversed",
+            "manual_refund"
+          ]
+        }
+      }
+    ]
+  },
+  "admin.refunds.show": {
+    "summary": "GET refunds/{refund} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminRefundResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.settings.index": {
+    "summary": "GET settings — administrator access required",
+    "tag": "Administration",
+    "response": "AdminSettingsResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "admin.settings.update": {
+    "summary": "PATCH settings/{key} — administrator access required",
+    "tag": "Administration",
+    "response": "AdminSettingResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AdminSettingUpdate"
+  },
+  "products.image": {
+    "summary": "Download an available approved-vendor product image",
+    "tag": "Catalogue",
+    "binary": true,
+    "content_type": "image/*",
+    "statuses": [
+      200
+    ]
+  },
+  "vendors.documents.index": {
+    "summary": "List your business verification documents",
+    "tag": "Vendors",
+    "response": "AdminDocumentPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  "vendors.documents.store": {
+    "summary": "Upload a private business verification document",
+    "tag": "Vendors",
+    "response": "AdminDocumentResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "request_media": "multipart/form-data",
+    "body": "AdminDocumentUpload"
+  },
+  "vendors.documents.download": {
+    "summary": "Download your business verification document",
+    "tag": "Vendors",
+    "response": "AdminVendorResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "binary": true,
+    "content_type": "application/octet-stream"
   }
 }

@@ -12,6 +12,15 @@ class Product extends DomainModel
 
     protected $table = 'products';
 
+    protected $hidden = ['image_path'];
+
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path === null ? null : route('api.v1.products.image', ['product' => $this->id]);
+    }
+
     protected function casts(): array
     {
         return ['available' => 'boolean', 'price' => 'integer', 'stock' => 'integer'];

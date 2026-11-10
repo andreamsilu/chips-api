@@ -26,7 +26,7 @@ final class AdminController extends Controller
     {
         Gate::authorize('administer');
 
-        return response()->json(Vendor::orderByDesc('id')->paginate(20));
+        return response()->json(AdminQuery::page($request, Vendor::withCount(['locations', 'orders', 'documents']), ['vendors.id', 'name'], ['status' => AdminQuery::enum(['pending', 'approved', 'rejected', 'suspended'])], ['created_at' => 'vendors.created_at', 'id' => 'vendors.id', 'name' => 'vendors.name', 'status' => 'vendors.status', 'commission_bps' => 'vendors.commission_bps']));
     }
 
     public function approve(Request $request, Vendor $vendor): JsonResponse
@@ -79,11 +79,11 @@ final class AdminController extends Controller
         return response()->json(['data' => $service->assign($delivery, Rider::findOrFail($data['rider_id']), $request->user())->only(['id', 'order_id', 'rider_id', 'status'])]);
     }
 
-    public function refunds(): JsonResponse
+    public function refunds(Request $request): JsonResponse
     {
         Gate::authorize('administer');
 
-        return response()->json(Refund::orderByDesc('id')->paginate(20));
+        return response()->json(AdminQuery::page($request, Refund::query(), ['refunds.id', 'order_id', 'provider_reference', 'external_receipt', 'reason'], ['status' => AdminQuery::enum(['requested', 'approved', 'manual_required', 'refunded', 'failed', 'reversed']), 'order_id' => AdminQuery::identifier()], ['created_at' => 'refunds.created_at', 'id' => 'refunds.id', 'amount' => 'refunds.amount', 'status' => 'refunds.status']));
     }
 
     public function refund(Request $request, Refund $refund, RefundService $service): JsonResponse
@@ -94,11 +94,11 @@ final class AdminController extends Controller
         return response()->json(['data' => $service->approve($refund, $request->user(), $data['external_receipt'] ?? null)]);
     }
 
-    public function settlements(): JsonResponse
+    public function settlements(Request $request): JsonResponse
     {
         Gate::authorize('administer');
 
-        return response()->json(Settlement::orderByDesc('id')->paginate(20));
+        return response()->json(AdminQuery::page($request, Settlement::withCount('entries'), ['settlements.id', 'vendor_id', 'external_reference'], ['status' => AdminQuery::enum(['prepared', 'paid', 'voided']), 'vendor_id' => AdminQuery::identifier()], ['created_at' => 'settlements.created_at', 'id' => 'settlements.id', 'amount' => 'settlements.amount', 'status' => 'settlements.status']));
     }
 
     public function prepare(Request $request, Vendor $vendor, SettlementService $service): JsonResponse
@@ -116,11 +116,11 @@ final class AdminController extends Controller
         return response()->json(['data' => $service->paid($settlement, $request->user(), $data['external_reference'])]);
     }
 
-    public function audit(): JsonResponse
+    public function audit(Request $request): JsonResponse
     {
         Gate::authorize('administer');
 
-        return response()->json(AuditLog::orderByDesc('id')->paginate(50));
+        return response()->json(AdminQuery::page($request, AuditLog::query(), ['audit_logs.id', 'action', 'subject_id', 'subject_type'], ['action' => ['rules' => ['sometimes', 'string', 'max:80']], 'subject_type' => ['rules' => ['sometimes', 'string', 'max:80']], 'subject_id' => ['rules' => ['sometimes', 'string', 'max:80']], 'actor_id' => AdminQuery::identifier() + ['apply' => fn ($q, string $id) => $q->whereIn('actor_id', User::where('public_id', $id)->select('id'))]]));
     }
 
     public function void(Request $request, Settlement $settlement, SettlementService $service): JsonResponse

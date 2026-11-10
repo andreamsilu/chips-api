@@ -34,6 +34,7 @@ final class RefundService
                 return $refund;
             }
             $manual = $order->payment_method === 'cash' || in_array($refund->status, ['manual_required', 'failed', 'reversed'], true);
+            Domain::require($cashReference === null || $manual, 'Process this refund first; a manual receipt is only valid for manual refunds.');
             if ($manual && $cashReference !== null) {
                 $refund->forceFill(['status' => 'refunded', 'approved_by' => $actor->id, 'external_receipt' => $cashReference])->save();
                 $order->forceFill(['payment_status' => 'refunded'])->save();

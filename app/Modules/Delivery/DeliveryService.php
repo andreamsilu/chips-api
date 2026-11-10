@@ -19,7 +19,7 @@ final class DeliveryService
             $delivery = Delivery::whereKey($input->id)->lockForUpdate()->firstOrFail();
             $rider = Rider::whereKey($rider->id)->lockForUpdate()->firstOrFail();
             Domain::require($order->status === 'ready' && $order->payment_status === 'verified', 'Only paid, ready orders may be assigned.');
-            Domain::require($rider->status === 'approved' && $rider->user()->whereNull('suspended_at')->exists(), 'Rider is unavailable.');
+            Domain::require($rider->status === 'approved' && $rider->available && $rider->user()->whereNull('suspended_at')->exists(), 'Rider is unavailable.');
             Domain::require(in_array($delivery->status, ['unassigned', 'assigned'], true), 'Delivery has already started.');
             $delivery->forceFill(['rider_id' => $rider->id, 'status' => 'assigned'])->save();
             Domain::audit($actor, 'delivery.assigned', $delivery, ['rider_id' => $rider->id]);

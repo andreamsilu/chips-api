@@ -26,3 +26,13 @@ No production database was migrated. No real charge, refund or settlement transf
 - NextSMS v2 customer order alerts implemented with encrypted delivery records, queued sending, atomic claims and scheduler recovery. Provider fixtures cover acceptance, rejection, missing configuration, oversized numeric IDs, invalid recipient data, obsolete snapshots, uncertain outcomes and bounded rate-limit retries.
 - Full backend suite: 57 passed, 865 assertions, including 14 NextSMS tests. PHPStan: zero errors. Pint completed. No dependencies or public API endpoints were added.
 - The additive sms_deliveries migration passes in the isolated SQLite feature-test database. Live MySQL migration remains dependent on repairing the existing local MySQL login. No live SMS was sent and no merchant token/sender was configured.
+
+## Administration expansion — 10 November 2026
+
+- Full SQLite feature suite: 91 passed, 1,615 assertions. The administration suite contains 34 cases covering permissions, tenant isolation, pagination/filter validation, date boundaries, account management, immutable snapshots, cancellation/refunds, reconciliation queues, ledger reports, private uploads, versioned settings and stale-stock conflicts.
+- Larastan level 5 passed without a baseline; Pint completed. Generated OpenAPI route/schema consistency checks passed (3 tests, 1,139 assertions).
+- Local MySQL 8.0.46 authentication is now working. SMS and administration migrations were successfully applied to the local application database. Historical notes above about unavailable local MySQL describe earlier verification only.
+- The matching Ecme dashboard passed 37 unit/integration tests, strict types, lint and its production build. Browser fixtures are isolated from the configured production API.
+- This task has not deployed production or sent real Snippe/NextSMS requests. Production still needs matching code, the additive migration, provider credentials, worker/recovery checks and authenticated integration verification. Existing process-concurrency tests remain separate release checks; the administration suite does not replace them.
+
+- Final isolated MySQL administration verification: **34 passed, 156 assertions** on MySQL 8.0.46. All 11 dashboard browser workflows also passed.

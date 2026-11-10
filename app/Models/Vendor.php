@@ -29,4 +29,16 @@ class Vendor extends DomainModel
     {
         return $this->hasMany(VendorLocation::class);
     }
+
+    /** @return HasMany<Order, $this> */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /** @return HasMany<VendorDocument, $this> */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(VendorDocument::class);
+    }
 }

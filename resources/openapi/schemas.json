@@ -126,6 +126,12 @@
             "admin"
           ]
         }
+      },
+      "permissions": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
       }
     },
     "required": [
@@ -2766,5 +2772,2795 @@
         "maxLength": 160
       }
     }
+  },
+  "AdminUser": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "phone": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "roles": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "status": {
+        "enum": [
+          "active",
+          "suspended"
+        ]
+      },
+      "suspended_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "orders_count": {
+        "type": "integer"
+      },
+      "unrestricted": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "email",
+      "roles",
+      "status"
+    ],
+    "additionalProperties": true
+  },
+  "AdminUserResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminUser"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminUserPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminUser"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminVendor": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "status": {
+        "enum": [
+          "pending",
+          "approved",
+          "rejected",
+          "suspended"
+        ]
+      },
+      "commission_bps": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000
+      },
+      "approved_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "locations_count": {
+        "type": "integer"
+      },
+      "orders_count": {
+        "type": "integer"
+      },
+      "documents_count": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "status",
+      "commission_bps"
+    ],
+    "additionalProperties": true
+  },
+  "AdminVendorResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminVendor"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminVendorPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminVendor"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminOrder": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [],
+        "additionalProperties": true
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "vendor_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "vendor_location_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "fulfilment": {
+        "enum": [
+          "pickup",
+          "delivery"
+        ]
+      },
+      "status": {
+        "type": "string"
+      },
+      "payment_method": {
+        "type": "string"
+      },
+      "payment_status": {
+        "type": "string"
+      },
+      "currency": {
+        "const": "TZS"
+      },
+      "subtotal": {
+        "type": "integer"
+      },
+      "discount": {
+        "type": "integer"
+      },
+      "delivery_fee": {
+        "type": "integer"
+      },
+      "commission": {
+        "type": "integer"
+      },
+      "commission_bps": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      },
+      "address": {
+        "type": [
+          "object",
+          "null"
+        ]
+      },
+      "payment": {
+        "type": [
+          "object",
+          "null"
+        ]
+      },
+      "refund": {
+        "type": [
+          "object",
+          "null"
+        ]
+      },
+      "delivery": {
+        "type": [
+          "object",
+          "null"
+        ]
+      },
+      "rider": {
+        "type": [
+          "object",
+          "null"
+        ]
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "string",
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+            },
+            "name": {
+              "type": "string"
+            },
+            "unit_price": {
+              "type": "integer"
+            },
+            "quantity": {
+              "type": "integer"
+            },
+            "line_total": {
+              "type": "integer"
+            },
+            "instructions": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [],
+          "additionalProperties": true
+        }
+      },
+      "history": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "from_status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "to_status": {
+              "type": "string"
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "created_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          },
+          "required": [],
+          "additionalProperties": true
+        }
+      }
+    },
+    "required": [
+      "id",
+      "status",
+      "payment_status",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminOrderResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminOrder"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminOrderPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminOrder"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminPayment": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "merchant_reference": {
+        "type": "string"
+      },
+      "provider_reference": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "status": {
+        "type": "string"
+      },
+      "amount": {
+        "type": "integer"
+      },
+      "currency": {
+        "const": "TZS"
+      },
+      "submitted_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "verified_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "order_id",
+      "status",
+      "amount"
+    ],
+    "additionalProperties": true
+  },
+  "AdminPaymentResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminPayment"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminPaymentPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminPayment"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminRider": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "status": {
+        "type": "string"
+      },
+      "vehicle": {
+        "type": "string"
+      },
+      "available": {
+        "type": "boolean"
+      },
+      "user": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [],
+        "additionalProperties": true
+      },
+      "deliveries_count": {
+        "type": "integer"
+      },
+      "active_deliveries_count": {
+        "type": "integer"
+      },
+      "completed_deliveries_count": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "id",
+      "status",
+      "vehicle",
+      "available"
+    ],
+    "additionalProperties": true
+  },
+  "AdminRiderResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminRider"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminRiderPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminRider"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminDelivery": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "rider_id": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "status": {
+        "type": "string"
+      },
+      "picked_up_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "delivered_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "rider": {
+        "type": [
+          "object",
+          "null"
+        ]
+      },
+      "payment_status": {
+        "type": "string"
+      },
+      "order_status": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "order_id",
+      "status"
+    ],
+    "additionalProperties": true
+  },
+  "AdminDeliveryResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminDelivery"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminDeliveryPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminDelivery"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminLocation": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "name": {
+        "type": "string"
+      },
+      "vendor_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "address": {
+        "type": "string"
+      },
+      "latitude": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "longitude": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "accepting_orders": {
+        "type": "boolean"
+      },
+      "delivery_enabled": {
+        "type": "boolean"
+      },
+      "pickup_enabled": {
+        "type": "boolean"
+      },
+      "delivery_radius_km": {
+        "type": "integer"
+      },
+      "products_count": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "name"
+    ],
+    "additionalProperties": true
+  },
+  "AdminLocationResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminLocation"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminLocationPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminLocation"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminProduct": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "vendor_location_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "category_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "price": {
+        "type": "integer"
+      },
+      "stock": {
+        "type": "integer"
+      },
+      "available": {
+        "type": "boolean"
+      },
+      "vendor_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "location_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "image_url": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "deleted_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "price",
+      "stock",
+      "available"
+    ],
+    "additionalProperties": true
+  },
+  "AdminProductResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminProduct"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminProductPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminProduct"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCategory": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "products_count": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "id",
+      "name"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCategoryResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminCategory"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCategoryPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminCategory"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCoupon": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "campaign_id": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "code": {
+        "type": "string",
+        "maxLength": 40
+      },
+      "discount": {
+        "type": "integer"
+      },
+      "minimum_subtotal": {
+        "type": "integer"
+      },
+      "usage_limit": {
+        "type": "integer"
+      },
+      "used": {
+        "type": "integer"
+      },
+      "starts_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "expires_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "active": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "code",
+      "discount"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCouponResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminCoupon"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCouponPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminCoupon"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCampaign": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "starts_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "expires_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "active": {
+        "type": "boolean"
+      },
+      "coupons_count": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "starts_at",
+      "expires_at",
+      "active"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCampaignResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminCampaign"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminCampaignPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminCampaign"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminDocument": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "kind": {
+        "enum": [
+          "business_license",
+          "identity",
+          "tax_certificate",
+          "other"
+        ]
+      },
+      "status": {
+        "enum": [
+          "pending",
+          "approved",
+          "rejected"
+        ]
+      },
+      "review_note": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "reviewed_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "kind",
+      "status"
+    ],
+    "additionalProperties": true
+  },
+  "AdminDocumentResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminDocument"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminDocumentPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminDocument"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminLedger": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "account": {
+        "type": "string"
+      },
+      "kind": {
+        "type": "string"
+      },
+      "amount": {
+        "type": "integer"
+      },
+      "currency": {
+        "const": "TZS"
+      }
+    },
+    "required": [
+      "id",
+      "order_id",
+      "account",
+      "kind",
+      "amount"
+    ],
+    "additionalProperties": true
+  },
+  "AdminLedgerResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminLedger"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminLedgerPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminLedger"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminSettlement": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "amount": {
+        "type": "integer"
+      },
+      "status": {
+        "type": "string"
+      },
+      "external_reference": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "paid_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "entries_count": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "amount",
+      "status"
+    ],
+    "additionalProperties": true
+  },
+  "AdminSettlementResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminSettlement"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminSettlementPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminSettlement"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminRefund": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "payment_id": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "amount": {
+        "type": "integer"
+      },
+      "status": {
+        "type": "string"
+      },
+      "reason": {
+        "type": "string"
+      },
+      "external_receipt": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "provider_reference": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "submitted_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "order_id",
+      "amount",
+      "status"
+    ],
+    "additionalProperties": true
+  },
+  "AdminRefundResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminRefund"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminRefundPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminRefund"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminAudit": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "actor_id": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "action": {
+        "type": "string"
+      },
+      "subject_type": {
+        "type": "string"
+      },
+      "subject_id": {
+        "type": "string"
+      },
+      "metadata": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "id",
+      "action"
+    ],
+    "additionalProperties": true
+  },
+  "AdminAuditResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminAudit"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminAuditPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminAudit"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminEvent": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "payment_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "provider_event_id": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "payment_id",
+      "type"
+    ],
+    "additionalProperties": true
+  },
+  "AdminEventResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminEvent"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminEventPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminEvent"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminSetting": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "key": {
+        "type": "string"
+      },
+      "value": {
+        "type": [
+          "string",
+          "integer",
+          "null"
+        ]
+      },
+      "version": {
+        "type": "integer"
+      },
+      "updated_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "key",
+      "value",
+      "version"
+    ],
+    "additionalProperties": true
+  },
+  "AdminSettingResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/AdminSetting"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminSettingPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminSetting"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "AdminUserCreate": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "phone": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "password": {
+        "type": "string",
+        "minLength": 12,
+        "maxLength": 1024
+      },
+      "password_confirmation": {
+        "type": "string"
+      },
+      "roles": {
+        "type": "array",
+        "items": {
+          "enum": [
+            "customer",
+            "vendor",
+            "rider",
+            "support",
+            "admin"
+          ]
+        }
+      }
+    },
+    "required": [
+      "name",
+      "email",
+      "password",
+      "password_confirmation",
+      "roles"
+    ],
+    "additionalProperties": false
+  },
+  "AdminUserUpdate": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "phone": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "status": {
+        "enum": [
+          "active",
+          "suspended"
+        ]
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "AdminRolesUpdate": {
+    "type": "object",
+    "properties": {
+      "roles": {
+        "type": "array",
+        "items": {
+          "enum": [
+            "customer",
+            "vendor",
+            "rider",
+            "support",
+            "admin"
+          ]
+        }
+      }
+    },
+    "required": [
+      "roles"
+    ],
+    "additionalProperties": false
+  },
+  "AdminPermissionsUpdate": {
+    "type": "object",
+    "properties": {
+      "unrestricted": {
+        "type": "boolean"
+      },
+      "permissions": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "unrestricted"
+    ],
+    "additionalProperties": false
+  },
+  "AdminPasswordUpdate": {
+    "type": "object",
+    "properties": {
+      "password": {
+        "type": "string",
+        "minLength": 12,
+        "maxLength": 1024
+      },
+      "password_confirmation": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "password",
+      "password_confirmation"
+    ],
+    "additionalProperties": false
+  },
+  "AdminCancellation": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "enum": [
+          "cancelled",
+          "rejected"
+        ]
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 500
+      }
+    },
+    "required": [
+      "status",
+      "reason"
+    ],
+    "additionalProperties": false
+  },
+  "AdminRefundRequest": {
+    "type": "object",
+    "properties": {
+      "reason": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 500
+      }
+    },
+    "required": [
+      "reason"
+    ],
+    "additionalProperties": false
+  },
+  "AdminRiderUpdate": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "enum": [
+          "pending",
+          "approved",
+          "rejected",
+          "suspended"
+        ]
+      },
+      "available": {
+        "type": "boolean"
+      },
+      "vehicle": {
+        "type": "string",
+        "maxLength": 100
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "AdminCategorySave": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 100
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "additionalProperties": false
+  },
+  "AdminProductCreate": {
+    "type": "object",
+    "properties": {
+      "vendor_location_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "category_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "price": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "stock": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000000
+      },
+      "available": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "vendor_location_id",
+      "category_id",
+      "name",
+      "price",
+      "stock",
+      "available"
+    ],
+    "additionalProperties": false
+  },
+  "AdminLocationCreate": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "address": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      },
+      "accepting_orders": {
+        "type": "boolean"
+      },
+      "delivery_enabled": {
+        "type": "boolean"
+      },
+      "pickup_enabled": {
+        "type": "boolean"
+      },
+      "delivery_radius_km": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      }
+    },
+    "required": [
+      "name",
+      "address",
+      "latitude",
+      "longitude",
+      "accepting_orders",
+      "delivery_enabled",
+      "pickup_enabled",
+      "delivery_radius_km"
+    ],
+    "additionalProperties": false
+  },
+  "AdminCouponCreate": {
+    "type": "object",
+    "properties": {
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "campaign_id": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "code": {
+        "type": "string",
+        "pattern": "^[A-Z0-9_-]{3,40}$"
+      },
+      "discount": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "minimum_subtotal": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "usage_limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000000
+      },
+      "starts_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "active": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "vendor_id",
+      "code",
+      "discount",
+      "minimum_subtotal",
+      "usage_limit",
+      "starts_at",
+      "expires_at",
+      "active"
+    ],
+    "additionalProperties": false
+  },
+  "AdminCampaignCreate": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "starts_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "active": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "starts_at",
+      "expires_at",
+      "active"
+    ],
+    "additionalProperties": false
+  },
+  "AdminDocumentUpload": {
+    "type": "object",
+    "properties": {
+      "kind": {
+        "enum": [
+          "business_license",
+          "identity",
+          "tax_certificate",
+          "other"
+        ]
+      },
+      "document": {
+        "type": "string",
+        "format": "binary"
+      }
+    },
+    "required": [
+      "kind",
+      "document"
+    ],
+    "additionalProperties": false
+  },
+  "AdminImageUpload": {
+    "type": "object",
+    "properties": {
+      "image": {
+        "type": "string",
+        "format": "binary"
+      }
+    },
+    "required": [
+      "image"
+    ],
+    "additionalProperties": false
+  },
+  "AdminDocumentReview": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "enum": [
+          "approved",
+          "rejected"
+        ]
+      },
+      "review_note": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "required": [
+      "status"
+    ],
+    "additionalProperties": false
+  },
+  "AdminSettingUpdate": {
+    "type": "object",
+    "properties": {
+      "value": {
+        "type": [
+          "integer",
+          "string",
+          "null"
+        ]
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "required": [
+      "value",
+      "version"
+    ],
+    "additionalProperties": false
+  },
+  "AdminProductUpdate": {
+    "type": "object",
+    "properties": {
+      "category_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "price": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "stock": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000000
+      },
+      "available": {
+        "type": "boolean"
+      },
+      "expected_stock": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000000
+      }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "dependentRequired": {
+      "stock": [
+        "expected_stock"
+      ]
+    }
+  },
+  "AdminLocationUpdate": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "address": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      },
+      "accepting_orders": {
+        "type": "boolean"
+      },
+      "delivery_enabled": {
+        "type": "boolean"
+      },
+      "pickup_enabled": {
+        "type": "boolean"
+      },
+      "delivery_radius_km": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "AdminCouponUpdate": {
+    "type": "object",
+    "properties": {
+      "campaign_id": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "code": {
+        "type": "string",
+        "pattern": "^[A-Z0-9_-]{3,40}$"
+      },
+      "discount": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "minimum_subtotal": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "usage_limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000000
+      },
+      "starts_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "active": {
+        "type": "boolean"
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "AdminCampaignUpdate": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "starts_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "active": {
+        "type": "boolean"
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "AdminFinanceResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "object",
+        "properties": {
+          "date_from": {
+            "type": "string",
+            "format": "date"
+          },
+          "date_to": {
+            "type": "string",
+            "format": "date"
+          },
+          "currency": {
+            "const": "TZS"
+          },
+          "gross_collections": {
+            "type": "integer"
+          },
+          "net_refunds": {
+            "type": "integer"
+          },
+          "net_collections": {
+            "type": "integer"
+          },
+          "net_commission": {
+            "type": "integer"
+          },
+          "platform_revenue": {
+            "type": "integer"
+          },
+          "delivery_revenue": {
+            "type": "integer"
+          },
+          "vendor_payable": {
+            "type": "integer"
+          },
+          "generated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "trend": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "orders": {
+                  "type": "integer"
+                },
+                "platform_revenue": {
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminDashboardResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "object",
+        "properties": {
+          "generated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "date_from": {
+            "type": "string",
+            "format": "date"
+          },
+          "date_to": {
+            "type": "string",
+            "format": "date"
+          },
+          "currency": {
+            "const": "TZS"
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "customers": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "vendors": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "active_vendors": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "pending_vendors": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "orders": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "today_orders": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "active_orders": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "riders": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "active_riders": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "customers",
+              "vendors",
+              "active_vendors",
+              "pending_vendors",
+              "orders",
+              "today_orders",
+              "active_orders",
+              "riders",
+              "active_riders"
+            ]
+          },
+          "finance": {
+            "$ref": "#/components/schemas/AdminFinanceTotals"
+          },
+          "orders_by_status": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "trend": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "orders": {
+                  "type": "integer"
+                },
+                "platform_revenue": {
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          "recent_orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOrder"
+            }
+          },
+          "recent_transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPayment"
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminRoleCatalogueResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "object",
+        "properties": {
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminSettingsResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminSetting"
+        }
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminPermissionsResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": true
+  },
+  "AdminFinanceTotals": {
+    "type": "object",
+    "properties": {
+      "gross_collections": {
+        "type": "integer",
+        "description": "Posted immutable ledger amount in TZS."
+      },
+      "net_refunds": {
+        "type": "integer",
+        "description": "Posted immutable ledger amount in TZS."
+      },
+      "net_collections": {
+        "type": "integer",
+        "description": "Posted immutable ledger amount in TZS."
+      },
+      "net_commission": {
+        "type": "integer",
+        "description": "Posted immutable ledger amount in TZS."
+      },
+      "delivery_revenue": {
+        "type": "integer",
+        "description": "Posted immutable ledger amount in TZS."
+      },
+      "platform_revenue": {
+        "type": "integer",
+        "description": "Posted immutable ledger amount in TZS."
+      },
+      "vendor_payable": {
+        "type": "integer",
+        "description": "Posted immutable ledger amount in TZS."
+      }
+    },
+    "required": [
+      "gross_collections",
+      "net_refunds",
+      "net_collections",
+      "net_commission",
+      "delivery_revenue",
+      "platform_revenue",
+      "vendor_payable"
+    ]
   }
 }
