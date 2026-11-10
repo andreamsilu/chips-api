@@ -111,4 +111,4 @@ GitLab is the primary remote at `git@gitlab.com:andreamsilu/chips-api.git`. The 
 
 To verify a deployment, compare the successful pipeline commit with `/var/www/chips-api/REVISION` on the server and check `/up` plus `/api/v1/categories`. A successful test/package job alone does not confirm production deployment.
 
-Deployment SSH variables must use GitLab File type, include the `production` environment, and be available to protected `main` pipelines. After rotating either SSH variable, run a fresh pipeline to verify deployment access.
+Deployment SSH variables must use GitLab File type, include the `production` environment, and be available to protected `main` pipelines. After rotating either SSH variable, run a fresh pipeline to verify deployment access. Confirm that `deploy_production` succeeds before considering the release deployed.
