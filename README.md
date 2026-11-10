@@ -110,3 +110,5 @@ Customer order alerts use NextSMS API v2 through the notifications queue. See [N
 GitLab is the primary remote at `git@gitlab.com:andreamsilu/chips-api.git`. The pipeline checks PHP 8.4/8.5 with MySQL/Redis, packages locked production dependencies and automatically deploys successful protected `main` builds. Configure the deployment account, Supervisor services and protected SSH file variables using [GitLab setup](docs/operations.md#gitlab-cicd). Server secrets and uploads are preserved.
 
 To verify a deployment, compare the successful pipeline commit with `/var/www/chips-api/REVISION` on the server and check `/up` plus `/api/v1/categories`. A successful test/package job alone does not confirm production deployment.
+
+Deployment SSH variables must use GitLab File type, include the `production` environment, and be available to protected `main` pipelines. After rotating either SSH variable, run a fresh pipeline to verify deployment access.
