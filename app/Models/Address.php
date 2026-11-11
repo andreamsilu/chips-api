@@ -11,8 +11,10 @@ class Address extends DomainModel
 
     protected $table = 'addresses';
 
+    protected $hidden = ['default_user_id'];
+
     protected function casts(): array
     {
-        return [];
+        return ['is_default' => 'boolean', 'latitude' => 'decimal:7', 'longitude' => 'decimal:7'];
     }
 }

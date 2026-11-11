@@ -209,6 +209,53 @@
         "type": "number",
         "minimum": -180,
         "maximum": 180
+      },
+      "formatted_address": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "google_place_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "landmark": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivery_instructions": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "is_default": {
+        "type": "boolean"
       }
     },
     "required": [
@@ -243,6 +290,53 @@
         "type": "number",
         "minimum": -180,
         "maximum": 180
+      },
+      "formatted_address": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "google_place_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "landmark": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivery_instructions": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "is_default": {
+        "type": "boolean"
       }
     },
     "required": [
@@ -930,6 +1024,17 @@
         "type": "integer",
         "minimum": 1,
         "maximum": 50
+      },
+      "google_place_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
       }
     },
     "required": [
@@ -989,7 +1094,104 @@
         "maximum": 50
       },
       "distance_km": {
-        "type": "number"
+        "anyOf": [
+          {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 20000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "google_place_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "location_verification_status": {
+        "enum": [
+          "pending",
+          "verified"
+        ]
+      },
+      "location_verified_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "straightline_distance_km": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 20000
+      },
+      "road_distance_meters": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "duration_seconds": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivery_fee": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivery_eligible": {
+        "type": "boolean"
+      },
+      "route_available": {
+        "type": "boolean"
+      },
+      "delivery_unavailable_reason": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "distance_type": {
+        "enum": [
+          "road",
+          "straight_line"
+        ]
       }
     },
     "required": [
@@ -2262,6 +2464,12 @@
       },
       "meta": {
         "type": "object"
+      },
+      "routing_available": {
+        "type": "boolean"
+      },
+      "search_limited": {
+        "type": "boolean"
       }
     },
     "required": [
@@ -2756,6 +2964,16 @@
           },
           "payment_available": {
             "type": "boolean"
+          },
+          "delivery": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryQuote"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       }
@@ -3577,6 +3795,30 @@
       },
       "products_count": {
         "type": "integer"
+      },
+      "google_place_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "location_verification_status": {
+        "enum": [
+          "pending",
+          "verified"
+        ]
+      },
+      "location_verified_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
       }
     },
     "required": [
@@ -4916,6 +5158,17 @@
         "type": "integer",
         "minimum": 1,
         "maximum": 50
+      },
+      "google_place_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
       }
     },
     "required": [
@@ -5174,6 +5427,17 @@
         "type": "integer",
         "minimum": 1,
         "maximum": 50
+      },
+      "google_place_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
       }
     },
     "required": [],
@@ -5562,5 +5826,959 @@
       "platform_revenue",
       "vendor_payable"
     ]
+  },
+  "LocationPoint": {
+    "type": "object",
+    "properties": {
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      }
+    },
+    "required": [
+      "latitude",
+      "longitude"
+    ],
+    "additionalProperties": false
+  },
+  "RoadRoute": {
+    "type": "object",
+    "properties": {
+      "route_available": {
+        "type": "boolean"
+      },
+      "distance_meters": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "distance_km": {
+        "anyOf": [
+          {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "duration_seconds": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 604800
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "duration_minutes": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "encoded_polyline": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 100000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "route_available",
+      "distance_meters",
+      "duration_seconds"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryQuote": {
+    "type": "object",
+    "properties": {
+      "route_available": {
+        "type": "boolean"
+      },
+      "distance_meters": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "distance_km": {
+        "anyOf": [
+          {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "duration_seconds": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 604800
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "duration_minutes": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "encoded_polyline": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 100000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "pricing_rule_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "pricing_version": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "pricing_method": {
+        "enum": [
+          "fixed",
+          "per_km",
+          "zones"
+        ]
+      },
+      "base_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "price_per_km": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "minimum_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "maximum_distance_meters": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50000
+      },
+      "zone_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "zone_name": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 100
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "source": {
+        "const": "google_routes"
+      },
+      "origin": {
+        "$ref": "#/components/schemas/LocationPoint"
+      },
+      "destination": {
+        "$ref": "#/components/schemas/LocationPoint"
+      }
+    },
+    "required": [
+      "route_available",
+      "distance_meters",
+      "duration_seconds",
+      "fee",
+      "pricing_rule_id",
+      "pricing_version"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryQuoteResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/DeliveryQuote"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": false
+  },
+  "LocationSuggestion": {
+    "type": "object",
+    "properties": {
+      "place_id": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "description": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "required": [
+      "place_id",
+      "description"
+    ],
+    "additionalProperties": false
+  },
+  "LocationSuggestionsResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "maxItems": 5,
+        "items": {
+          "$ref": "#/components/schemas/LocationSuggestion"
+        }
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": false
+  },
+  "PlaceLookup": {
+    "type": "object",
+    "properties": {
+      "place_id": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "session_token": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "required": [
+      "place_id",
+      "session_token"
+    ],
+    "additionalProperties": false
+  },
+  "LocationAutocomplete": {
+    "type": "object",
+    "properties": {
+      "input": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 3
+      },
+      "session_token": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "required": [
+      "input",
+      "session_token"
+    ],
+    "additionalProperties": false
+  },
+  "LocationGeocode": {
+    "type": "object",
+    "properties": {
+      "address": {
+        "type": "string",
+        "maxLength": 500,
+        "minLength": 3
+      },
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "description": "Supply either address, or both latitude and longitude. These options are mutually exclusive."
+  },
+  "NormalizedPlace": {
+    "type": "object",
+    "properties": {
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      },
+      "formatted_address": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "place_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "latitude",
+      "longitude",
+      "formatted_address"
+    ],
+    "additionalProperties": false
+  },
+  "NormalizedPlaceResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/NormalizedPlace"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": false
+  },
+  "LocationQuoteInput": {
+    "type": "object",
+    "properties": {
+      "address_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      }
+    },
+    "required": [
+      "address_id"
+    ],
+    "additionalProperties": false
+  },
+  "RiderPosition": {
+    "type": "object",
+    "properties": {
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      },
+      "accuracy_meters": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2000
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "latitude",
+      "longitude"
+    ],
+    "additionalProperties": false
+  },
+  "OrderTracking": {
+    "type": "object",
+    "properties": {
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "status": {
+        "type": "string",
+        "maxLength": 40
+      },
+      "delivery_status": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 40
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "destination": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "longitude": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "address": {
+                "type": "string",
+                "maxLength": 500
+              }
+            },
+            "required": [
+              "latitude",
+              "longitude",
+              "address"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "origin": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/LocationPoint"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivery": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/DeliveryQuote"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "rider": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "longitude": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "accuracy_meters": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "latitude",
+              "longitude",
+              "updated_at",
+              "accuracy_meters"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "route": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/RoadRoute"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "routing_error": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "order_id",
+      "status",
+      "delivery_status",
+      "destination",
+      "origin",
+      "delivery",
+      "rider",
+      "route",
+      "routing_error"
+    ],
+    "additionalProperties": false
+  },
+  "OrderTrackingResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/OrderTracking"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryZone": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "delivery_pricing_rule_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "maximum_distance_meters": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50000
+      },
+      "fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "active": {
+        "type": "boolean"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "maximum_distance_meters",
+      "fee",
+      "active"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryZoneInput": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "maximum_distance_meters": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50000
+      },
+      "fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "active": {
+        "type": "boolean"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      }
+    },
+    "required": [
+      "name",
+      "maximum_distance_meters",
+      "fee",
+      "active",
+      "version"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryZoneResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/DeliveryZone"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryPricingRule": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "vendor_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "pricing_method": {
+        "enum": [
+          "fixed",
+          "per_km",
+          "zones"
+        ]
+      },
+      "fixed_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "base_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "price_per_km": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "minimum_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "maximum_distance_meters": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50000
+      },
+      "active": {
+        "type": "boolean"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "zones": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/DeliveryZone"
+        }
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "pricing_method",
+      "fixed_fee",
+      "base_fee",
+      "price_per_km",
+      "minimum_fee",
+      "maximum_distance_meters",
+      "active",
+      "version",
+      "created_at",
+      "zones"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryPricingCreate": {
+    "type": "object",
+    "properties": {
+      "pricing_method": {
+        "enum": [
+          "fixed",
+          "per_km",
+          "zones"
+        ]
+      },
+      "fixed_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "base_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "price_per_km": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "minimum_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "maximum_distance_meters": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50000
+      },
+      "active": {
+        "type": "boolean"
+      },
+      "vendor_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      }
+    },
+    "required": [
+      "pricing_method",
+      "fixed_fee",
+      "base_fee",
+      "price_per_km",
+      "minimum_fee",
+      "maximum_distance_meters",
+      "active",
+      "vendor_id"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryPricingUpdate": {
+    "type": "object",
+    "properties": {
+      "pricing_method": {
+        "enum": [
+          "fixed",
+          "per_km",
+          "zones"
+        ]
+      },
+      "fixed_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "base_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "price_per_km": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "minimum_fee": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000000
+      },
+      "maximum_distance_meters": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50000
+      },
+      "active": {
+        "type": "boolean"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      }
+    },
+    "required": [
+      "pricing_method",
+      "fixed_fee",
+      "base_fee",
+      "price_per_km",
+      "minimum_fee",
+      "maximum_distance_meters",
+      "active",
+      "version"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryPricingResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/DeliveryPricingRule"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": false
+  },
+  "DeliveryPricingPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/DeliveryPricingRule"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "LocationVerify": {
+    "type": "object",
+    "properties": {
+      "latitude": {
+        "type": "number",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180
+      }
+    },
+    "required": [
+      "latitude",
+      "longitude"
+    ],
+    "additionalProperties": false
   }
 }

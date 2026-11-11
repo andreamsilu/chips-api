@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/** @property array|null $address_snapshot */
 class Order extends DomainModel
 {
     use ProtectsSnapshots;
@@ -64,5 +65,11 @@ class Order extends DomainModel
     public function customer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /** @return BelongsTo<VendorLocation, $this> */
+    public function vendorLocation(): BelongsTo
+    {
+        return $this->belongsTo(VendorLocation::class);
     }
 }

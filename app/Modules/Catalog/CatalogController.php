@@ -31,9 +31,9 @@ final class CatalogController extends Controller
 
     public function discovery(Request $request, DiscoveryRepository $repository): JsonResponse
     {
-        $data = $request->validate(['latitude' => ['required', 'numeric', 'between:-90,90'], 'longitude' => ['required', 'numeric', 'between:-180,180'], 'radius' => ['sometimes', 'integer', 'between:1,50'], 'page' => ['sometimes', 'integer', 'between:1,10000']]);
+        $data = $request->validate(['latitude' => ['required', 'numeric', 'between:-90,90'], 'longitude' => ['required', 'numeric', 'between:-180,180'], 'radius' => ['sometimes', 'integer', 'between:1,50'], 'page' => ['sometimes', 'integer', 'between:1,10000'], 'sort' => ['sometimes', 'in:recommended,nearest,fastest,lowest_fee'], 'fulfilment' => ['sometimes', 'in:all,delivery,pickup']]);
 
-        return response()->json($repository->nearby((float) $data['latitude'], (float) $data['longitude'], (int) ($data['radius'] ?? 15), (int) ($data['page'] ?? 1)));
+        return response()->json($repository->nearby((float) $data['latitude'], (float) $data['longitude'], (int) ($data['radius'] ?? 15), (int) ($data['page'] ?? 1), $data['sort'] ?? 'recommended', $data['fulfilment'] ?? 'all'));
     }
 
     public function categories(): JsonResponse

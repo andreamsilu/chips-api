@@ -40,7 +40,10 @@ final class AdminCatalogController extends Controller
             $query->where('vendor_id', $vendor->id);
         }
 
-        return response()->json(AdminQuery::page($request, $query, ['vendor_locations.id', 'vendor_locations.name', 'address'], ['vendor_id' => AdminQuery::identifier(), 'accepting_orders' => AdminQuery::boolean(), 'delivery_enabled' => AdminQuery::boolean(), 'pickup_enabled' => AdminQuery::boolean()], ['created_at' => 'vendor_locations.created_at', 'name' => 'vendor_locations.name', 'id' => 'vendor_locations.id']));
+        return response()->json(AdminQuery::page($request, $query, ['vendor_locations.id', 'vendor_locations.name', 'address'], ['vendor_id' => AdminQuery::identifier(), 'accepting_orders' => AdminQuery::boolean(), 'delivery_enabled' => AdminQuery::boolean(), 'pickup_enabled' => AdminQuery::boolean(), 'coordinate_status' => AdminQuery::enum(['valid', 'invalid']) + ['apply' => function (Builder $query, string $value): void {
+            $invalid = '(latitude IS NULL OR longitude IS NULL OR latitude < -90 OR latitude > 90 OR longitude < -180 OR longitude > 180)';
+            $query->whereRaw($value === 'invalid' ? $invalid : 'NOT '.$invalid);
+        }], 'location_verification_status' => AdminQuery::enum(['pending', 'verified'])], ['created_at' => 'vendor_locations.created_at', 'name' => 'vendor_locations.name', 'id' => 'vendor_locations.id']));
     }
 
     public function storeLocation(Request $request, Vendor $vendor): JsonResponse
@@ -56,12 +59,16 @@ final class AdminCatalogController extends Controller
     private function saveLocation(Request $request, Vendor $vendor, ?VendorLocation $location = null): JsonResponse
     {
         $required = $location === null ? 'required' : 'sometimes';
-        $data = AdminQuery::body($request, ['name' => [$required, 'required', 'string', 'max:160'], 'address' => [$required, 'required', 'string', 'max:500'], 'latitude' => [$required, 'numeric', 'between:-90,90'], 'longitude' => [$required, 'numeric', 'between:-180,180'], 'accepting_orders' => [$required, 'boolean'], 'delivery_enabled' => [$required, 'boolean'], 'pickup_enabled' => [$required, 'boolean'], 'delivery_radius_km' => [$required, 'integer', 'between:1,50']]);
+        $data = AdminQuery::body($request, ['name' => [$required, 'required', 'string', 'max:160'], 'address' => [$required, 'required', 'string', 'max:500'], 'latitude' => [$required, 'numeric', 'between:-90,90'], 'longitude' => [$required, 'numeric', 'between:-180,180'], 'accepting_orders' => [$required, 'boolean'], 'delivery_enabled' => [$required, 'boolean'], 'pickup_enabled' => [$required, 'boolean'], 'delivery_radius_km' => [$required, 'integer', 'between:1,50'], 'google_place_id' => ['sometimes', 'nullable', 'string', 'max:255']]);
         $model = DB::transaction(function () use ($request, $vendor, $location, $data): VendorLocation {
             Vendor::whereKey($vendor->id)->lockForUpdate()->firstOrFail();
             $model = $location === null ? VendorLocation::record($data + ['vendor_id' => $vendor->id]) : VendorLocation::whereKey($location->id)->lockForUpdate()->firstOrFail();
             if ($location !== null) {
-                $model->forceFill($data)->save();
+                $model->forceFill($data);
+                if ($model->isDirty(['latitude', 'longitude', 'address', 'google_place_id'])) {
+                    $model->forceFill(['location_verification_status' => 'pending', 'location_verified_at' => null, 'location_verified_by' => null]);
+                }
+                $model->save();
             }
             Domain::audit($request->user(), 'location.admin_saved', $model);
 

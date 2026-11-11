@@ -3,6 +3,7 @@
 namespace App\Modules\Administration;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeliveryPricingRule;
 use App\Models\Role;
 use App\Models\SystemSetting;
 use App\Support\Domain;
@@ -38,9 +39,14 @@ final class AdminSettingsController extends Controller
         $data = AdminQuery::body($request, ['value' => ['present', ...$rules], 'version' => ['required', 'integer', 'min:0']]);
         $model = DB::transaction(function () use ($request, $key, $data): SystemSetting {
             Role::where('name', 'admin')->lockForUpdate()->firstOrFail();
+            $pricing = in_array($key, ['delivery_base_fee', 'delivery_per_km'], true) ? DeliveryPricingRule::where('scope_key', 'global')->lockForUpdate()->first() : null;
             $model = SystemSetting::whereKey($key)->lockForUpdate()->first() ?? new SystemSetting;
             Domain::require((int) ($model->version ?? 0) === $data['version'], 'Setting changed. Refresh before saving again.');
             $model->forceFill(['key' => $key, 'value' => $data['value'], 'version' => $data['version'] + 1, 'updated_by' => $request->user()->id])->save();
+            if ($pricing) {
+                $field = $key === 'delivery_base_fee' ? 'base_fee' : 'price_per_km';
+                $pricing->forceFill([$field => $data['value'], 'version' => $pricing->version + 1, 'updated_by' => $request->user()->id])->save();
+            }
             Domain::audit($request->user(), 'setting.updated', $model, ['version' => $model->version]);
 
             return $model;

@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\User;
+use App\Modules\Delivery\DeliveryPricingService;
 use App\Modules\Payments\PaymentOperation;
 use App\Support\Domain;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 final class CheckoutService
 {
-    public function __construct(private PricingService $pricing) {}
+    public function __construct(private PricingService $pricing, private DeliveryPricingService $delivery) {}
 
     public function checkout(User $user, string $key, array $data): Order
     {
@@ -25,7 +26,16 @@ final class CheckoutService
         ksort($data);
         $hash = hash('sha256', json_encode($data, JSON_THROW_ON_ERROR));
 
-        return DB::transaction(function () use ($user, $key, $data, $hash): Order {
+        $existing = IdempotencyRecord::where(['user_id' => $user->id, 'operation' => 'checkout', 'key' => $key])->first();
+        if ($existing) {
+            Domain::require(hash_equals($existing->request_hash, $hash), 'Idempotency key was used with different input.');
+
+            return Order::findOrFail($existing->resource_id);
+        }
+        Domain::require($data['fulfilment'] === 'pickup' || $data['payment_method'] !== 'cash', 'Delivery requires mobile-money payment.');
+        $preparedRoute = $this->delivery->prepare($user, $data);
+
+        return DB::transaction(function () use ($user, $key, $data, $hash, $preparedRoute): Order {
             User::whereKey($user->id)->lockForUpdate()->firstOrFail();
             $existing = IdempotencyRecord::where(['user_id' => $user->id, 'operation' => 'checkout', 'key' => $key])->first();
             if ($existing) {
@@ -41,7 +51,7 @@ final class CheckoutService
             if ($cart->version !== $data['cart_version']) {
                 throw ValidationException::withMessages(['cart_version' => 'Cart changed. Review it before checkout.']);
             }
-            $pricing = $this->pricing->calculate($user, $cart, $data);
+            $pricing = $this->pricing->calculate($user, $cart, $data, $preparedRoute);
             ['lines' => $lines,'location' => $location,'vendor' => $vendor,'products' => $products,'subtotal' => $subtotal,'fee' => $fee,'snapshot' => $snapshot,'discount' => $discount,'coupon' => $coupon] = $pricing;
             if (isset($data['expected_total']) && (int) $data['expected_total'] !== $subtotal - $discount + $fee) {
                 throw ValidationException::withMessages(['expected_total' => 'Prices changed. Review the updated total before paying.']);
@@ -85,17 +95,20 @@ final class CheckoutService
 
     public function quote(User $user, array $data): array
     {
-        return DB::transaction(function () use ($user, $data): array {
+        Domain::require($data['fulfilment'] === 'pickup' || $data['payment_method'] !== 'cash', 'Delivery requires mobile-money payment.');
+        $preparedRoute = $this->delivery->prepare($user, $data);
+
+        return DB::transaction(function () use ($user, $data, $preparedRoute): array {
             User::whereKey($user->id)->lockForUpdate()->firstOrFail();
             $cart = Cart::where('user_id', $user->id)->lockForUpdate()->firstOrFail();
             Domain::require($cart->version === (int) $data['cart_version'], 'Cart changed. Review it before checkout.');
-            $p = $this->pricing->calculate($user, $cart, $data);
+            $p = $this->pricing->calculate($user, $cart, $data, $preparedRoute);
             $total = $p['subtotal'] - $p['discount'] + $p['fee'];
             Domain::require($data['fulfilment'] === 'pickup' || $data['payment_method'] !== 'cash', 'Delivery requires mobile-money payment.');
             Domain::require($total > 0, 'Order total must be positive.');
             Domain::require($data['payment_method'] === 'cash' || $total >= 500, 'Snippe requires a payment of at least TZS 500.');
 
-            return ['cart_version' => $cart->version, 'subtotal' => $p['subtotal'], 'discount' => $p['discount'], 'delivery_fee' => $p['fee'], 'total' => $total, 'currency' => 'TZS', 'payment_available' => $data['payment_method'] === 'cash' || (bool) (config('marketplace.gateway_url') && config('marketplace.gateway_token') && config('marketplace.webhook_secret') && str_starts_with((string) config('marketplace.webhook_url'), 'https://'))];
+            return ['delivery' => $p['snapshot']['delivery'] ?? null, 'cart_version' => $cart->version, 'subtotal' => $p['subtotal'], 'discount' => $p['discount'], 'delivery_fee' => $p['fee'], 'total' => $total, 'currency' => 'TZS', 'payment_available' => $data['payment_method'] === 'cash' || (bool) (config('marketplace.gateway_url') && config('marketplace.gateway_token') && config('marketplace.webhook_secret') && str_starts_with((string) config('marketplace.webhook_url'), 'https://'))];
         }, 3);
     }
 }

@@ -3471,6 +3471,761 @@
                 }
             }
         },
+        "/api/v1/admin/deliveries/{delivery}/tracking": {
+            "get": {
+                "operationId": "admin_deliveries_tracking_get",
+                "summary": "Read authorized administrative delivery map",
+                "tags": [
+                    "Administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "delivery",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                        }
+                    },
+                    {
+                        "name": "include_route",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderTrackingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/delivery-pricing": {
+            "get": {
+                "operationId": "admin_delivery-pricing_index_get",
+                "summary": "List versioned delivery pricing rules",
+                "tags": [
+                    "Administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10000,
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 100
+                        },
+                        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "default": "desc"
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "created_at",
+                                "id"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "vendor_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeliveryPricingPage"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "admin_delivery-pricing_store_post",
+                "summary": "Create vendor pricing override",
+                "tags": [
+                    "Administration"
+                ],
+                "parameters": [],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeliveryPricingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeliveryPricingCreate"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/delivery-pricing/{rule}": {
+            "patch": {
+                "operationId": "admin_delivery-pricing_update_patch",
+                "summary": "Update pricing with current version",
+                "tags": [
+                    "Administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "rule",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeliveryPricingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeliveryPricingUpdate"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/delivery-pricing/{rule}/zones": {
+            "post": {
+                "operationId": "admin_delivery-pricing_zones_post",
+                "summary": "Add distance band with current parent version",
+                "tags": [
+                    "Administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "rule",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeliveryZoneResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeliveryZoneInput"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/delivery-zones/{zone}": {
+            "patch": {
+                "operationId": "admin_delivery-zones_update_patch",
+                "summary": "Update distance band with current parent version",
+                "tags": [
+                    "Administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "zone",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeliveryZoneResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeliveryZoneInput"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/finance/export": {
             "get": {
                 "operationId": "admin_finance_export_get",
@@ -4034,6 +4789,26 @@
                         "schema": {
                             "type": "boolean"
                         }
+                    },
+                    {
+                        "name": "location_verification_status",
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "pending",
+                                "verified"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "coordinate_status",
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "valid",
+                                "invalid"
+                            ]
+                        }
                     }
                 ],
                 "security": [
@@ -4237,6 +5012,124 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/AdminLocationUpdate"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/locations/{location}/verify": {
+            "post": {
+                "operationId": "admin_locations_verify_post",
+                "summary": "Verify current business coordinates",
+                "tags": [
+                    "Administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "location",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminLocationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LocationVerify"
                             }
                         }
                     }
@@ -10539,6 +11432,26 @@
                         "schema": {
                             "type": "boolean"
                         }
+                    },
+                    {
+                        "name": "location_verification_status",
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "pending",
+                                "verified"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "coordinate_status",
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "valid",
+                                "invalid"
+                            ]
+                        }
                     }
                 ],
                 "security": [
@@ -11892,6 +12805,327 @@
                 }
             }
         },
+        "/api/v1/location/autocomplete": {
+            "post": {
+                "operationId": "location_autocomplete_post",
+                "summary": "Search Tanzania addresses with a Places session",
+                "tags": [
+                    "Location"
+                ],
+                "parameters": [],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LocationSuggestionsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LocationAutocomplete"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/location/geocode": {
+            "post": {
+                "operationId": "location_geocode_post",
+                "summary": "Geocode an address or reverse-geocode coordinates",
+                "tags": [
+                    "Location"
+                ],
+                "parameters": [],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NormalizedPlaceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LocationGeocode"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/location/place": {
+            "post": {
+                "operationId": "location_place_post",
+                "summary": "Resolve a selected place and end its search session",
+                "tags": [
+                    "Location"
+                ],
+                "parameters": [],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NormalizedPlaceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PlaceLookup"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/locations": {
             "get": {
                 "operationId": "locations_index_get",
@@ -11938,6 +13172,29 @@
                             "type": "integer",
                             "minimum": 1,
                             "maximum": 50
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "recommended",
+                                "nearest",
+                                "fastest",
+                                "lowest_fee"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "fulfilment",
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "all",
+                                "delivery",
+                                "pickup"
+                            ]
                         }
                     }
                 ],
@@ -12124,6 +13381,124 @@
                                 "schema": {
                                     "$ref": "#/components/schemas/Error"
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/locations/{location}/delivery-quote": {
+            "post": {
+                "operationId": "location_quote_post",
+                "summary": "Quote road delivery to an owned address",
+                "tags": [
+                    "Location"
+                ],
+                "parameters": [
+                    {
+                        "name": "location",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeliveryQuoteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LocationQuoteInput"
                             }
                         }
                     }
@@ -13207,6 +14582,121 @@
                 }
             }
         },
+        "/api/v1/orders/{order}/tracking": {
+            "get": {
+                "operationId": "orders_tracking_get",
+                "summary": "Read authorized order map and active rider location",
+                "tags": [
+                    "Location"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                        }
+                    },
+                    {
+                        "name": "include_route",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderTrackingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/products/{product}/image": {
             "get": {
                 "operationId": "products_image_get",
@@ -13532,6 +15022,124 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/DeliveryTransition"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rider/deliveries/{delivery}/location": {
+            "patch": {
+                "operationId": "deliveries_location_patch",
+                "summary": "Update assigned rider position during active delivery",
+                "tags": [
+                    "Location"
+                ],
+                "parameters": [
+                    {
+                        "name": "delivery",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource absent or outside your scope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "State, stock, reference or idempotency conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Required service is not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RiderPosition"
                             }
                         }
                     }
@@ -16367,6 +17975,53 @@
                         "type": "number",
                         "minimum": -180,
                         "maximum": 180
+                    },
+                    "formatted_address": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "google_place_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "landmark": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "delivery_instructions": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "is_default": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -16401,6 +18056,53 @@
                         "type": "number",
                         "minimum": -180,
                         "maximum": 180
+                    },
+                    "formatted_address": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "google_place_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "landmark": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "delivery_instructions": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "is_default": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -17088,6 +18790,17 @@
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 50
+                    },
+                    "google_place_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -17147,7 +18860,104 @@
                         "maximum": 50
                     },
                     "distance_km": {
-                        "type": "number"
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "google_place_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "location_verification_status": {
+                        "enum": [
+                            "pending",
+                            "verified"
+                        ]
+                    },
+                    "location_verified_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "straightline_distance_km": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20000
+                    },
+                    "road_distance_meters": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10000000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "duration_seconds": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10000000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "delivery_fee": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10000000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "delivery_eligible": {
+                        "type": "boolean"
+                    },
+                    "route_available": {
+                        "type": "boolean"
+                    },
+                    "delivery_unavailable_reason": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "distance_type": {
+                        "enum": [
+                            "road",
+                            "straight_line"
+                        ]
                     }
                 },
                 "required": [
@@ -18420,6 +20230,12 @@
                     },
                     "meta": {
                         "type": "object"
+                    },
+                    "routing_available": {
+                        "type": "boolean"
+                    },
+                    "search_limited": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -18914,6 +20730,16 @@
                             },
                             "payment_available": {
                                 "type": "boolean"
+                            },
+                            "delivery": {
+                                "anyOf": [
+                                    {
+                                        "$ref": "#/components/schemas/DeliveryQuote"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
                             }
                         }
                     }
@@ -19735,6 +21561,30 @@
                     },
                     "products_count": {
                         "type": "integer"
+                    },
+                    "google_place_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "location_verification_status": {
+                        "enum": [
+                            "pending",
+                            "verified"
+                        ]
+                    },
+                    "location_verified_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
                     }
                 },
                 "required": [
@@ -21074,6 +22924,17 @@
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 50
+                    },
+                    "google_place_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -21332,6 +23193,17 @@
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 50
+                    },
+                    "google_place_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     }
                 },
                 "required": [],
@@ -21720,6 +23592,960 @@
                     "platform_revenue",
                     "vendor_payable"
                 ]
+            },
+            "LocationPoint": {
+                "type": "object",
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "minimum": -90,
+                        "maximum": 90
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                    }
+                },
+                "required": [
+                    "latitude",
+                    "longitude"
+                ],
+                "additionalProperties": false
+            },
+            "RoadRoute": {
+                "type": "object",
+                "properties": {
+                    "route_available": {
+                        "type": "boolean"
+                    },
+                    "distance_meters": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10000000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "distance_km": {
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 10000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "duration_seconds": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 604800
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "duration_minutes": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10000000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "encoded_polyline": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 100000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "route_available",
+                    "distance_meters",
+                    "duration_seconds"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryQuote": {
+                "type": "object",
+                "properties": {
+                    "route_available": {
+                        "type": "boolean"
+                    },
+                    "distance_meters": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10000000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "distance_km": {
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 10000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "duration_seconds": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 604800
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "duration_minutes": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10000000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "encoded_polyline": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 100000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "pricing_rule_id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    "pricing_version": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10000000
+                    },
+                    "pricing_method": {
+                        "enum": [
+                            "fixed",
+                            "per_km",
+                            "zones"
+                        ]
+                    },
+                    "base_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "price_per_km": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "minimum_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "maximum_distance_meters": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 50000
+                    },
+                    "zone_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "zone_name": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 100
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "source": {
+                        "const": "google_routes"
+                    },
+                    "origin": {
+                        "$ref": "#/components/schemas/LocationPoint"
+                    },
+                    "destination": {
+                        "$ref": "#/components/schemas/LocationPoint"
+                    }
+                },
+                "required": [
+                    "route_available",
+                    "distance_meters",
+                    "duration_seconds",
+                    "fee",
+                    "pricing_rule_id",
+                    "pricing_version"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryQuoteResponse": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/DeliveryQuote"
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "additionalProperties": false
+            },
+            "LocationSuggestion": {
+                "type": "object",
+                "properties": {
+                    "place_id": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "place_id",
+                    "description"
+                ],
+                "additionalProperties": false
+            },
+            "LocationSuggestionsResponse": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "maxItems": 5,
+                        "items": {
+                            "$ref": "#/components/schemas/LocationSuggestion"
+                        }
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "additionalProperties": false
+            },
+            "PlaceLookup": {
+                "type": "object",
+                "properties": {
+                    "place_id": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "session_token": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                "required": [
+                    "place_id",
+                    "session_token"
+                ],
+                "additionalProperties": false
+            },
+            "LocationAutocomplete": {
+                "type": "object",
+                "properties": {
+                    "input": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 3
+                    },
+                    "session_token": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                "required": [
+                    "input",
+                    "session_token"
+                ],
+                "additionalProperties": false
+            },
+            "LocationGeocode": {
+                "type": "object",
+                "properties": {
+                    "address": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "minLength": 3
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "minimum": -90,
+                        "maximum": 90
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                    }
+                },
+                "required": [],
+                "additionalProperties": false,
+                "description": "Supply either address, or both latitude and longitude. These options are mutually exclusive."
+            },
+            "NormalizedPlace": {
+                "type": "object",
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "minimum": -90,
+                        "maximum": 90
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                    },
+                    "formatted_address": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "place_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "latitude",
+                    "longitude",
+                    "formatted_address"
+                ],
+                "additionalProperties": false
+            },
+            "NormalizedPlaceResponse": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/NormalizedPlace"
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "additionalProperties": false
+            },
+            "LocationQuoteInput": {
+                "type": "object",
+                "properties": {
+                    "address_id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    }
+                },
+                "required": [
+                    "address_id"
+                ],
+                "additionalProperties": false
+            },
+            "RiderPosition": {
+                "type": "object",
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "minimum": -90,
+                        "maximum": 90
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                    },
+                    "accuracy_meters": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "latitude",
+                    "longitude"
+                ],
+                "additionalProperties": false
+            },
+            "OrderTracking": {
+                "type": "object",
+                "properties": {
+                    "order_id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    "status": {
+                        "type": "string",
+                        "maxLength": 40
+                    },
+                    "delivery_status": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 40
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "destination": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "minimum": -90,
+                                        "maximum": 90
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "minimum": -180,
+                                        "maximum": 180
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    }
+                                },
+                                "required": [
+                                    "latitude",
+                                    "longitude",
+                                    "address"
+                                ],
+                                "additionalProperties": false
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "origin": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationPoint"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "delivery": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/DeliveryQuote"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "rider": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "minimum": -90,
+                                        "maximum": 90
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "minimum": -180,
+                                        "maximum": 180
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "accuracy_meters": {
+                                        "anyOf": [
+                                            {
+                                                "type": "integer",
+                                                "minimum": 0,
+                                                "maximum": 2000
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "latitude",
+                                    "longitude",
+                                    "updated_at",
+                                    "accuracy_meters"
+                                ],
+                                "additionalProperties": false
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "route": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/RoadRoute"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "routing_error": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "order_id",
+                    "status",
+                    "delivery_status",
+                    "destination",
+                    "origin",
+                    "delivery",
+                    "rider",
+                    "route",
+                    "routing_error"
+                ],
+                "additionalProperties": false
+            },
+            "OrderTrackingResponse": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/OrderTracking"
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryZone": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    "delivery_pricing_rule_id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "maximum_distance_meters": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 50000
+                    },
+                    "fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "maximum_distance_meters",
+                    "fee",
+                    "active"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryZoneInput": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "maximum_distance_meters": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 50000
+                    },
+                    "fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "version": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10000000
+                    }
+                },
+                "required": [
+                    "name",
+                    "maximum_distance_meters",
+                    "fee",
+                    "active",
+                    "version"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryZoneResponse": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/DeliveryZone"
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryPricingRule": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    "vendor_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "pricing_method": {
+                        "enum": [
+                            "fixed",
+                            "per_km",
+                            "zones"
+                        ]
+                    },
+                    "fixed_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "base_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "price_per_km": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "minimum_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "maximum_distance_meters": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 50000
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "version": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10000000
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "zones": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DeliveryZone"
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "vendor_id",
+                    "pricing_method",
+                    "fixed_fee",
+                    "base_fee",
+                    "price_per_km",
+                    "minimum_fee",
+                    "maximum_distance_meters",
+                    "active",
+                    "version",
+                    "created_at",
+                    "zones"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryPricingCreate": {
+                "type": "object",
+                "properties": {
+                    "pricing_method": {
+                        "enum": [
+                            "fixed",
+                            "per_km",
+                            "zones"
+                        ]
+                    },
+                    "fixed_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "base_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "price_per_km": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "minimum_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "maximum_distance_meters": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 50000
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "vendor_id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    }
+                },
+                "required": [
+                    "pricing_method",
+                    "fixed_fee",
+                    "base_fee",
+                    "price_per_km",
+                    "minimum_fee",
+                    "maximum_distance_meters",
+                    "active",
+                    "vendor_id"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryPricingUpdate": {
+                "type": "object",
+                "properties": {
+                    "pricing_method": {
+                        "enum": [
+                            "fixed",
+                            "per_km",
+                            "zones"
+                        ]
+                    },
+                    "fixed_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "base_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "price_per_km": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "minimum_fee": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000000
+                    },
+                    "maximum_distance_meters": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 50000
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "version": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10000000
+                    }
+                },
+                "required": [
+                    "pricing_method",
+                    "fixed_fee",
+                    "base_fee",
+                    "price_per_km",
+                    "minimum_fee",
+                    "maximum_distance_meters",
+                    "active",
+                    "version"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryPricingResponse": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/DeliveryPricingRule"
+                    }
+                },
+                "required": [
+                    "data"
+                ],
+                "additionalProperties": false
+            },
+            "DeliveryPricingPage": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DeliveryPricingRule"
+                        }
+                    },
+                    "current_page": {
+                        "type": "integer"
+                    },
+                    "last_page": {
+                        "type": "integer"
+                    },
+                    "per_page": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "data",
+                    "current_page",
+                    "last_page",
+                    "per_page",
+                    "total"
+                ],
+                "additionalProperties": true
+            },
+            "LocationVerify": {
+                "type": "object",
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "minimum": -90,
+                        "maximum": 90
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                    }
+                },
+                "required": [
+                    "latitude",
+                    "longitude"
+                ],
+                "additionalProperties": false
             }
         }
     }

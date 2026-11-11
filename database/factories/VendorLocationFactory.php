@@ -13,6 +13,6 @@ class VendorLocationFactory extends Factory
 
     public function definition(): array
     {
-        return ['vendor_id' => Vendor::factory(), 'name' => 'Mikocheni', 'address' => 'Mikocheni, Dar es Salaam', 'latitude' => -6.77, 'longitude' => 39.25, 'accepting_orders' => true, 'delivery_enabled' => true, 'pickup_enabled' => true, 'delivery_radius_km' => 15];
+        return ['vendor_id' => Vendor::factory(), 'name' => 'Mikocheni', 'address' => 'Mikocheni, Dar es Salaam', 'latitude' => -6.77, 'longitude' => 39.25, 'accepting_orders' => true, 'delivery_enabled' => true, 'pickup_enabled' => true, 'delivery_radius_km' => 15, 'location_verification_status' => 'verified', 'location_verified_at' => now()];
     }
 }

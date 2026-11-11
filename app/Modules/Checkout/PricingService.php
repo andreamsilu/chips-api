@@ -11,15 +11,14 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorLocation;
-use App\Modules\Catalog\DiscoveryRepository;
+use App\Modules\Delivery\DeliveryPricingService;
 use App\Support\Domain;
-use App\Support\MarketplaceSettings;
 
 final class PricingService
 {
-    public function __construct(private MarketplaceSettings $settings) {}
+    public function __construct(private DeliveryPricingService $delivery) {}
 
-    public function calculate(User $user, Cart $cart, array $data): array
+    public function calculate(User $user, Cart $cart, array $data, ?array $preparedRoute = null): array
     {
         $lines = $cart->items()->orderBy('product_id')->get();
         Domain::require($lines->isNotEmpty(), 'Cart is empty.');
@@ -38,10 +37,10 @@ final class PricingService
         $snapshot = ['details' => $location->address, 'latitude' => $location->latitude, 'longitude' => $location->longitude];
         if ($data['fulfilment'] === 'delivery') {
             $address = Address::where('user_id', $user->id)->findOrFail($data['address_id']);
-            $distance = DiscoveryRepository::distance((float) $location->latitude, (float) $location->longitude, (float) $address->latitude, (float) $address->longitude);
-            Domain::require($distance <= $location->delivery_radius_km, 'Address is outside the delivery zone.');
-            $fee = $this->settings->integer('delivery_base_fee', (int) config('marketplace.delivery_base_fee')) + (int) ceil($distance) * $this->settings->integer('delivery_per_km', (int) config('marketplace.delivery_per_km'));
-            $snapshot = $address->only(['label', 'details', 'latitude', 'longitude']);
+            Domain::require($preparedRoute !== null, 'Request a fresh delivery quote.');
+            $delivery = $this->delivery->quote($location, $address, $preparedRoute);
+            $fee = $delivery['fee'];
+            $snapshot = $address->only(['label', 'details', 'latitude', 'longitude', 'formatted_address', 'google_place_id', 'landmark', 'delivery_instructions']) + ['delivery' => $delivery];
         }
         $discount = 0;
         $coupon = null;

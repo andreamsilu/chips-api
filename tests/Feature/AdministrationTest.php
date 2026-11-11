@@ -46,6 +46,7 @@ class AdministrationTest extends TestCase
 
     private function order(): Order
     {
+        $this->fakeRoadRouting();
         config(['marketplace.webhook_secret' => str_repeat('a', 32), 'marketplace.gateway_token' => 'test-only', 'marketplace.gateway_url' => 'https://gateway.example', 'marketplace.webhook_url' => 'https://api.example/api/v1/webhooks/payments']);
         $customer = $this->user('customer');
         $vendor = Vendor::factory()->create();

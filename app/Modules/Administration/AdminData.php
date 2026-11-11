@@ -60,7 +60,7 @@ final class AdminData
             return $model->only(['id', 'name', 'status', 'commission_bps', 'approved_at', 'created_at', 'locations_count', 'orders_count', 'documents_count']);
         }
         if ($model instanceof VendorLocation) {
-            return $model->only(['id', 'vendor_id', 'name', 'address', 'latitude', 'longitude', 'accepting_orders', 'delivery_enabled', 'pickup_enabled', 'delivery_radius_km', 'created_at', 'products_count']) + ['vendor_name' => $model->vendor?->name];
+            return $model->only(['id', 'vendor_id', 'name', 'address', 'latitude', 'longitude', 'accepting_orders', 'delivery_enabled', 'pickup_enabled', 'delivery_radius_km', 'google_place_id', 'location_verification_status', 'location_verified_at', 'created_at', 'products_count']) + ['vendor_name' => $model->vendor?->name];
         }
         if ($model instanceof Product) {
             return $model->only(['id', 'vendor_location_id', 'category_id', 'name', 'description', 'price', 'stock', 'available', 'created_at', 'deleted_at']) + ['vendor_name' => $model->location?->vendor?->name, 'location_name' => $model->location?->name, 'image_url' => $model->image_path === null ? null : route('api.v1.admin.products.image', ['product' => $model->id])];

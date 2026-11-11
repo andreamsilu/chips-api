@@ -32,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($request->user()->id ?? $request->ip()));
         RateLimiter::for('authentication', fn (Request $request) => [Limit::perMinute(5)->by(hash('sha256', strtolower((string) $request->input('email')).'|'.$request->ip())), Limit::perMinute(30)->by($request->ip())]);
         RateLimiter::for('checkout', fn (Request $request) => Limit::perMinute(10)->by($request->user()->id ?? $request->ip()));
+        RateLimiter::for('maps', fn (Request $request) => [Limit::perMinute(30)->by('maps-user:'.($request->user()->id ?? $request->ip())), Limit::perMinute(300)->by('maps-provider')]);
+        RateLimiter::for('rider-position', fn (Request $request) => Limit::perMinute(12)->by($request->user()->id));
         RateLimiter::for('webhooks', fn (Request $request) => Limit::perMinute(600)->by($request->ip()));
     }
 }

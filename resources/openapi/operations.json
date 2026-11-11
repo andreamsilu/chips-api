@@ -209,6 +209,29 @@
           "minimum": 1,
           "maximum": 50
         }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "recommended",
+            "nearest",
+            "fastest",
+            "lowest_fee"
+          ]
+        }
+      },
+      {
+        "name": "fulfilment",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "all",
+            "delivery",
+            "pickup"
+          ]
+        }
       }
     ]
   },
@@ -2208,6 +2231,26 @@
         "schema": {
           "type": "boolean"
         }
+      },
+      {
+        "name": "location_verification_status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "pending",
+            "verified"
+          ]
+        }
+      },
+      {
+        "name": "coordinate_status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
+        }
       }
     ]
   },
@@ -2317,6 +2360,26 @@
         "in": "query",
         "schema": {
           "type": "boolean"
+        }
+      },
+      {
+        "name": "location_verification_status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "pending",
+            "verified"
+          ]
+        }
+      },
+      {
+        "name": "coordinate_status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
         }
       }
     ]
@@ -3384,5 +3447,225 @@
     "paginate": false,
     "binary": true,
     "content_type": "application/octet-stream"
+  },
+  "location.autocomplete": {
+    "summary": "Search Tanzania addresses with a Places session",
+    "tag": "Location",
+    "response": "LocationSuggestionsResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "LocationAutocomplete"
+  },
+  "location.place": {
+    "summary": "Resolve a selected place and end its search session",
+    "tag": "Location",
+    "response": "NormalizedPlaceResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "PlaceLookup"
+  },
+  "location.geocode": {
+    "summary": "Geocode an address or reverse-geocode coordinates",
+    "tag": "Location",
+    "response": "NormalizedPlaceResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "LocationGeocode"
+  },
+  "location.quote": {
+    "summary": "Quote road delivery to an owned address",
+    "tag": "Location",
+    "response": "DeliveryQuoteResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "LocationQuoteInput"
+  },
+  "orders.tracking": {
+    "summary": "Read authorized order map and active rider location",
+    "tag": "Location",
+    "response": "OrderTrackingResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "query": [
+      {
+        "name": "include_route",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ]
+  },
+  "deliveries.location": {
+    "summary": "Update assigned rider position during active delivery",
+    "tag": "Location",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "RiderPosition"
+  },
+  "admin.delivery-pricing.index": {
+    "summary": "List versioned delivery pricing rules",
+    "tag": "Administration",
+    "response": "DeliveryPricingPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "active",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id"
+          ]
+        }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      }
+    ]
+  },
+  "admin.delivery-pricing.store": {
+    "summary": "Create vendor pricing override",
+    "tag": "Administration",
+    "response": "DeliveryPricingResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "DeliveryPricingCreate"
+  },
+  "admin.delivery-pricing.update": {
+    "summary": "Update pricing with current version",
+    "tag": "Administration",
+    "response": "DeliveryPricingResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "DeliveryPricingUpdate"
+  },
+  "admin.delivery-pricing.zones": {
+    "summary": "Add distance band with current parent version",
+    "tag": "Administration",
+    "response": "DeliveryZoneResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "DeliveryZoneInput"
+  },
+  "admin.delivery-zones.update": {
+    "summary": "Update distance band with current parent version",
+    "tag": "Administration",
+    "response": "DeliveryZoneResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "DeliveryZoneInput"
+  },
+  "admin.locations.verify": {
+    "summary": "Verify current business coordinates",
+    "tag": "Administration",
+    "response": "AdminLocationResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "LocationVerify"
+  },
+  "admin.deliveries.tracking": {
+    "summary": "Read authorized administrative delivery map",
+    "tag": "Administration",
+    "response": "OrderTrackingResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "query": [
+      {
+        "name": "include_route",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ]
   }
 }

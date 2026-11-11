@@ -48,6 +48,7 @@ class MarketplaceTest extends TestCase
 
     private function fixture(): array
     {
+        $this->fakeRoadRouting();
         $customer = $this->role(User::factory()->create(), 'customer');
         $owner = $this->role(User::factory()->create(), 'vendor');
         $vendor = Vendor::factory()->create();
