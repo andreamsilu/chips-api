@@ -33,7 +33,7 @@ final class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $data = $request->validate(['email' => ['required', 'email'], 'password' => ['required', 'string', 'max:1024'], 'device_name' => ['required', 'string', 'max:100']]);
-        $user = User::where('email', $data['email'])->first();
+        $user = User::where('is_guest', false)->where('email', $data['email'])->first();
         if (! $user || ! Hash::check($data['password'], $user->password) || $user->suspended_at !== null) {
             throw ValidationException::withMessages(['email' => 'The provided credentials are incorrect.']);
         }

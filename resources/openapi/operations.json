@@ -1907,6 +1907,14 @@
         "schema": {
           "type": "boolean"
         }
+      },
+      {
+        "name": "vendor_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
       }
     ]
   },
@@ -3665,6 +3673,474 @@
         "schema": {
           "type": "boolean"
         }
+      }
+    ]
+  },
+  "vendor.riders.index": {
+    "summary": "List riders owned by an approved business",
+    "tag": "Delivery",
+    "response": "VendorRiderPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "approved",
+            "suspended"
+          ]
+        }
+      },
+      {
+        "name": "available",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id"
+          ]
+        }
+      }
+    ]
+  },
+  "vendor.riders.store": {
+    "summary": "Create a dedicated business-owned rider login",
+    "tag": "Delivery",
+    "body": "VendorRiderCreate",
+    "response": "VendorRiderResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false
+  },
+  "vendor.riders.update": {
+    "summary": "Manage an owned rider availability and status",
+    "tag": "Delivery",
+    "body": "VendorRiderUpdate",
+    "response": "VendorRiderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "vendor.deliveries.index": {
+    "summary": "List deliveries for an approved business",
+    "tag": "Delivery",
+    "response": "VendorDeliveryPage",
+    "statuses": [
+      200
+    ],
+    "paginate": true,
+    "query": [
+      {
+        "name": "per_page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "description": "Case-insensitive literal substring search across this collection; applies before pagination."
+      },
+      {
+        "name": "date_from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "date_to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "Inclusive East Africa calendar date; translated to a UTC index range."
+      },
+      {
+        "name": "direction",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "default": "desc"
+        }
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "unassigned",
+            "assigned",
+            "picked_up",
+            "delivered"
+          ]
+        }
+      },
+      {
+        "name": "rider_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "order_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+        }
+      },
+      {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "enum": [
+            "created_at",
+            "id"
+          ]
+        }
+      }
+    ]
+  },
+  "vendor.deliveries.assign": {
+    "summary": "Assign an owned available rider to a paid ready order",
+    "tag": "Delivery",
+    "body": "VendorDeliveryAssign",
+    "response": "VendorDeliveryResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "vendor.deliveries.update": {
+    "summary": "Record pickup or completion of a business delivery",
+    "tag": "Delivery",
+    "body": "DeliveryTransition",
+    "response": "VendorDeliveryResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false
+  },
+  "guest.sessions.store": {
+    "summary": "Start a private guest cart without registration",
+    "tag": "Guest checkout",
+    "response": "GuestSessionResponse",
+    "statuses": [
+      201
+    ]
+  },
+  "guest.cart.show": {
+    "summary": "Read your cart and version",
+    "tag": "Guest checkout",
+    "response": "CartResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.cart.items": {
+    "summary": "Set product quantity; zero removes it",
+    "tag": "Guest checkout",
+    "response": "CartResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "CartItemInput",
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.cart.quote": {
+    "summary": "Review a server-calculated cart total without placing an order",
+    "tag": "Guest checkout",
+    "body": "GuestQuote",
+    "response": "QuoteResponse",
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.addresses.index": {
+    "summary": "List your saved addresses",
+    "tag": "Guest checkout",
+    "response": "AddressList",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.addresses.store": {
+    "summary": "Create your address",
+    "tag": "Guest checkout",
+    "response": "AddressResponse",
+    "statuses": [
+      201
+    ],
+    "paginate": false,
+    "body": "AddressInput",
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.addresses.update": {
+    "summary": "Update your address",
+    "tag": "Guest checkout",
+    "response": "AddressResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "AddressInput",
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.addresses.destroy": {
+    "summary": "Soft-delete your address",
+    "tag": "Guest checkout",
+    "response": "Message",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.location.autocomplete": {
+    "summary": "Search Tanzania addresses with a Places session",
+    "tag": "Guest checkout",
+    "response": "LocationSuggestionsResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "LocationAutocomplete",
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.location.place": {
+    "summary": "Resolve a selected place and end its search session",
+    "tag": "Guest checkout",
+    "response": "NormalizedPlaceResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "PlaceLookup",
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.location.geocode": {
+    "summary": "Geocode an address or reverse-geocode coordinates",
+    "tag": "Guest checkout",
+    "response": "NormalizedPlaceResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "LocationGeocode",
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "guest.orders.show": {
+    "summary": "Read an authorized order and snapshots",
+    "tag": "Guest checkout",
+    "response": "OrderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "security": [
+      {
+        "guestOrderAuth": []
+      }
+    ]
+  },
+  "guest.orders.tracking": {
+    "summary": "Read authorized order map and active rider location",
+    "tag": "Guest checkout",
+    "response": "OrderTrackingResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "query": [
+      {
+        "name": "include_route",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ],
+    "security": [
+      {
+        "guestOrderAuth": []
+      }
+    ]
+  },
+  "guest.orders.cancel": {
+    "summary": "Cancel your order before acceptance",
+    "tag": "Guest checkout",
+    "response": "OrderResponse",
+    "statuses": [
+      200
+    ],
+    "paginate": false,
+    "body": "Reason",
+    "security": [
+      {
+        "guestOrderAuth": []
+      }
+    ]
+  },
+  "guest.orders.refund": {
+    "summary": "Request a full refund for your order",
+    "tag": "Guest checkout",
+    "response": "RefundResponse",
+    "statuses": [
+      202
+    ],
+    "paginate": false,
+    "body": "Reason",
+    "security": [
+      {
+        "guestOrderAuth": []
+      }
+    ]
+  },
+  "guest.checkout": {
+    "summary": "Reserve priced items; idempotent checkout",
+    "tag": "Guest checkout",
+    "response": "GuestOrderResponse",
+    "statuses": [
+      200,
+      201
+    ],
+    "paginate": false,
+    "body": "GuestCheckout",
+    "security": [
+      {
+        "guestSessionAuth": []
+      }
+    ]
+  },
+  "cart.guest-merge": {
+    "summary": "Merge your guest cart into your authenticated account; conflicting kitchen carts remain unchanged",
+    "tag": "Guest checkout",
+    "response": "GuestMergeResponse",
+    "security": [
+      {
+        "bearerAuth": [],
+        "guestSessionAuth": []
       }
     ]
   }

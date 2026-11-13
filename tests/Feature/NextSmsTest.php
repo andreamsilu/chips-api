@@ -30,7 +30,7 @@ class NextSmsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['services.nextsms.enabled' => true, 'services.nextsms.token' => 'test-nextsms-token', 'services.nextsms.sender' => 'MLOEXPRESS']);
+        config(['services.nextsms.authorization' => null, 'services.nextsms.api_url' => self::ENDPOINT, 'services.nextsms.enabled' => true, 'services.nextsms.token' => 'test-nextsms-token', 'services.nextsms.sender' => 'MLOEXPRESS']);
     }
 
     private function staged(): OutboxMessage
@@ -222,5 +222,41 @@ class NextSmsTest extends TestCase
         $job->handle(new NextSmsGateway);
         $this->assertDatabaseHas('sms_deliveries', ['status' => 'rejected', 'attempts' => 5, 'error_code' => 'rate_limited']);
         Http::assertSentCount(1);
+    }
+
+    public function test_basic_v1_credentials_send_the_documented_payload(): void
+    {
+        $endpoint = 'https://messaging-service.co.tz/api/sms/v1/text/single';
+        $authorization = 'Basic '.base64_encode('fixture-user:fixture-password');
+        config(['services.nextsms.api_url' => $endpoint, 'services.nextsms.authorization' => $authorization, 'services.nextsms.token' => null, 'services.nextsms.sender' => 'TAPA']);
+        Http::preventStrayRequests();
+        Http::fake([$endpoint => Http::response($this->accepted())]);
+        $result = (new NextSmsGateway)->send('255712345678', 'Order ready.', 'fixture-event');
+        $this->assertSame('accepted', $result['status']);
+        Http::assertSent(fn (Request $request) => $request->url() === $endpoint && $request->hasHeader('Authorization', $authorization) && $request->data() === ['from' => 'TAPA', 'to' => '255712345678', 'text' => 'Order ready.']);
+        Http::assertSentCount(1);
+    }
+
+    public function test_sms_endpoint_and_authentication_must_match_before_any_request(): void
+    {
+        Http::preventStrayRequests();
+        $gateway = new NextSmsGateway;
+        foreach ([
+            ['https://example.test/api/sms/v1/text/single', 'Basic '.base64_encode('fixture:password')],
+            ['http://messaging-service.co.tz/api/sms/v1/text/single', 'Basic '.base64_encode('fixture:password')],
+            [self::ENDPOINT, 'Basic '.base64_encode('fixture:password')],
+            ['https://messaging-service.co.tz/api/sms/v1/text/single', null],
+            ['https://messaging-service.co.tz/api/sms/v1/text/single', 'Basic invalid'],
+            ['https://messaging-service.co.tz/api/sms/v1/text/single', 'Basic '.base64_encode('missing-separator')],
+        ] as [$endpoint, $authorization]) {
+            config(['services.nextsms.api_url' => $endpoint, 'services.nextsms.authorization' => $authorization]);
+            try {
+                $gateway->send('255712345678', 'Order ready.', 'fixture-event');
+                $this->fail('Unsafe or mismatched SMS configuration must be rejected.');
+            } catch (\RuntimeException $exception) {
+                $this->assertStringNotContainsString('fixture:password', $exception->getMessage());
+            }
+        }
+        Http::assertNothingSent();
     }
 }

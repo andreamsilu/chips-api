@@ -153,6 +153,8 @@ Run the existing notifications queue and scheduler. Alerts use event snapshots; 
 
 No automatic resend occurs for unknown outcomes (timeouts, server failures, malformed responses) or submitting records left by a crashed worker. The reference equals the outbox event ID for merchant-dashboard investigation; it is not assumed to provide provider idempotency. Operators must confirm acceptance/rejection in NextSMS reports before considering a resend. Provider response bodies, tokens and plaintext recipients/messages are not written to application logs or failed-job payloads. Delivery callbacks/report polling are not exposed by this change; consult the merchant dashboard for final delivery. Monitor queued, unknown, rejected and stale submitting records. Disabled operation does not backfill already published historical events.
 
+Legacy Basic-auth accounts can instead set NEXT_SMS_AUTHORIZATION privately, NEXT_SMS_API_URL=https://messaging-service.co.tz/api/sms/v1/text/single and NEXT_SMS_SENDER_ID to their approved sender. The latter sender overrides NEXTSMS_SENDER_ID when nonempty. Keep NEXTSMS_ENABLED=true only when ready for queued order alerts. V1 requires Basic authentication; v2 requires NEXTSMS_API_TOKEN and an empty NEXT_SMS_AUTHORIZATION. Only these two exact HTTPS single-message endpoints are allowed, and redirects remain disabled. V1 sends the documented from/to/text fields; the outbox retains the local event identifier. Invalid combinations fail before a network request. Do not place actual authorization values in deployment artifacts or source control.
+
 NextSMS transport tests use HTTP fixtures only. No live SMS has been sent; credentials, approved sender, migration and account-specific delivery verification are still required.
 
 ## Deploying the administration expansion
@@ -173,3 +175,60 @@ Administrative endpoints require an active admin role and a module read/manage p
 Search, filters and sorting are server-side. per_page is bounded to 100 and page to 10,000. Large exports must be narrowed to 366 days and 100,000 ledger entries. Net period revenue may be negative when a refund posts later than its original capture; do not substitute order totals for ledger balances. Reconciliation is a queued provider verification, not an operator payment-success override.
 
 Uploads require writable storage/app/private. Public product images are served through the product-image endpoint; private verification documents must not be exposed by a web-server alias or public symlink. Images are JPEG/PNG/WebP (5 MB, 4096×4096); documents are PDF/JPEG/PNG (10 MB). Keep Nginx/PHP request limits compatible with these bounds and the existing authentication/rate limits enabled. Production provider secrets remain in deployment configuration and are not available in dashboard settings.
+
+## Vendor-managed deliveries and riders
+
+The rider schema currently has one unique user account per rider and no business ownership. Add a nullable vendor_id foreign key and a (vendor_id, status, available) index. Existing rider records remain unowned until an administrator associates them with a vendor; do not infer ownership from historical jobs. The vendor rider and delivery APIs scope every read and write to an approved business that the caller manages. Vendors create dedicated rider accounts with only the rider role, manage their availability/status, assign their own riders, and record pickup/completion. Platform administrators retain audited oversight. Rider self-service remains restricted to assigned deliveries.
+
+```mermaid
+erDiagram
+    vendors ||--o{ riders : manages
+    users ||--o| riders : authenticates
+    riders |o--o{ deliveries : assigned
+    orders ||--o| deliveries : fulfilled_by
+```
+
+New checkout snapshots set delivery.fee_beneficiary=vendor. On verified payment the vendor payable includes the food net of commission plus delivery fee; platform commission remains calculated on food only. Legacy orders without this marker retain their original platform delivery-fee allocation, including later refunds. Immutable snapshots and prior ledger entries are not rewritten. Rider wages/transfers remain the vendor's responsibility and are not automatically paid by this change.
+
+Vendor delivery endpoints (all under /api/v1, Sanctum authentication required):
+
+- GET/POST /vendor/businesses/{vendor}/riders — paginated own roster / create a dedicated rider account.
+- PATCH /vendor/businesses/{vendor}/riders/{rider} — update own rider vehicle, availability or approved/suspended status.
+- GET /vendor/businesses/{vendor}/deliveries — paginated own delivery orders, with status/rider/order filters.
+- POST /vendor/businesses/{vendor}/deliveries/{delivery}/assignment — assign/reassign an owned, available rider to a verified-paid, ready order.
+- PATCH /vendor/businesses/{vendor}/deliveries/{delivery} — record picked_up or delivered, with payment and transition guards.
+
+Flutter vendor workspace: Orders → Manage deliveries & riders. Vendors can create rider logins, edit vehicles, change availability/status, assign riders, confirm pickup/completion and open the existing delivery-map preview. New rider accounts receive only the rider role; credentials are not returned or logged. The vendor supplies and privately shares an initial password. Existing registered accounts are not silently claimed by another business. Administrators can associate legacy rider profiles with a vendor through the rider edit form. Ownership transfer is blocked during active assignments and clears the last known position on a permitted transfer.
+
+Run the additive add_vendor_ownership_to_riders migration before deploying these APIs. Do not auto-backfill vendor_id from historical deliveries. One rider profile belongs to at most one vendor in this implementation. A rider cannot receive a second active assignment; suspension requires reassignment or completion of active work. Existing admin assignment endpoints remain available for audited oversight and reject riders owned by a different vendor.
+
+The delivery fee is credited to the vendor settlement balance only after verified customer payment. Settlement release still follows completed-delivery eligibility and the existing verified external-transfer workflow. This change does not initiate vendor or rider payouts automatically. Delivery pricing and mobile-money verification stay server-controlled. Existing orders without fee_beneficiary=vendor retain their original allocation.
+
+Validation for vendor delivery ownership: the backend suite passes 121 tests (1,965 assertions), including tenant isolation, rider-account role restrictions, verified-payment assignment, busy-rider protection, active-transfer prevention, historical fee allocation, settlement amount and refund reversal. Larastan and Pint pass, and the additive migration has run successfully on local MySQL. Flutter analysis is clean; its broader suite passes 41 tests with the optional live-server check skipped, and all four focused vendor workflow tests pass, including rider creation and vehicle editing. Admin unit tests (57), type checks, lint and production build pass. Provider calls in automated tests remain faked. These changes require production deployment and the new migration before using the updated mobile controls against the VPS.
+
+The updated Android debug APK was rebuilt successfully at the Flutter workspace's build/app/outputs/flutter-apk/app-debug.apk. Install it only with a compatible backend deployment when testing the new vendor controls; the production migration and publication are separate from local verification. No live payment, SMS, vendor transfer or rider payout was initiated during these checks.
+
+## Guest checkout architecture and migration plan
+
+Keep catalogue browsing public. Guest carts and addresses use a private, expiring anonymous session token, never a phone-number lookup. Existing cart/order/payment services continue to use an internal User ownership key; mark those records is_guest, permit null email/password for these non-login identities, and grant them no roles or Sanctum tokens. Registered-account registration and staff permissions remain unchanged. Guest contact information belongs to the immutable order snapshot, not a shared account identified by phone/email.
+
+Add guest_sessions (ULID, unique user FK, unique SHA-256 token hash, expiry) and guest_order_access_tokens (ULID, unique order FK, session FK, unique token hash, encrypted recoverable token for idempotent replay, expiry). Store only hashes for request authentication. Return the order capability only after authorized guest checkout, over the private no-store response. Separate middleware accepts X-Guest-Token only on guest cart/address/checkout routes and X-Order-Token only on that single order's read/tracking/cancel/refund routes. Neither token authenticates registered-account, vendor, rider or administrative operations.
+
+```mermaid
+erDiagram
+    users ||--o| guest_sessions : anonymous_owner
+    guest_sessions ||--o{ guest_order_access_tokens : issues
+    orders ||--o| guest_order_access_tokens : private_access
+    users ||--o{ carts : owns
+    users ||--o{ addresses : owns
+```
+
+Mobile clients create guest sessions lazily, retain their opaque tokens in secure storage, and keep account login optional. Guest orders are accessible through privately retained per-order tokens on that device; registering/logging in with the same phone/email never claims another order. A phone-only order recovery/OTP flow is outside this change. Snippe's existing direct mobile-money collection endpoint requires an actual email, so guest checkout asks for payment email without registering an account or accepting a password. Preserve pricing, paid-before-preparation gates, financial snapshots, signed webhooks, refund checks and vendor-owned delivery fees.
+
+Guest configuration uses the existing APP_KEY to encrypt replayable order tokens; preserve it across deployments and backups. Optional GUEST_SESSION_TTL_MINUTES defaults to 10080 (7 days) and GUEST_ORDER_TTL_MINUTES to 43200 (30 days). CORS allows X-Guest-Token and X-Order-Token only for the existing configured origins. Do not log these headers, expose tokens in URLs, or publish anonymous order histories. Reinstalling/clearing app storage loses private order access; no phone-only recovery or automatic account claiming is implemented.
+
+POST /guest/sessions creates only an anonymous ownership record, without phone, email, password, roles or Sanctum access. Use its token for /guest/cart, /guest/cart/items, /guest/cart/quote, /guest/addresses, /guest/location/* and /guest/checkout. Idempotency-Key remains required at checkout. The checkout response includes guest_order_token and guest_order_expires_at alongside data; replay returns the same encrypted-at-rest capability. Use that token for /guest/orders/{order}, /tracking, /cancel and /refund. There is deliberately no public guest order-list/search endpoint. Existing administrator reconciliation remains administrator-only.
+
+POST /cart/guest-merge requires both registered Sanctum authentication and the private guest session token. The operation locks both owners and merges compatible cart quantities transactionally; kitchen/quantity conflicts preserve both carts. It does not transfer guest order ownership or guest addresses. Registering with matching contact details has no effect on guest ownership. Anonymous order contacts are snapshotted per order; account-management lists exclude anonymous owners, and staff role/password operations reject them.
+
+Apply 2026_11_13_084536_add_guest_checkout_access before enabling the updated app. Existing users keep is_guest=false and existing rows are preserved. Local WSL MySQL migration has succeeded. A rollback refuses to remove guest ownership when nullable guest login records exist: use a forward fix. Production deployment and migration remain necessary. Signed payment verification, server pricing, refund ledgers, vendor cash confirmation and vendor delivery-fee allocation are retained. Guest SMS is staged only after verified payment; automated checks send no live SMS or payment requests.

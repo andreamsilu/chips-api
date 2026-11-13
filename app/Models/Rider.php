@@ -19,6 +19,12 @@ class Rider extends DomainModel
         return ['available' => 'boolean', 'location_updated_at' => 'datetime'];
     }
 
+    /** @return BelongsTo<Vendor, $this> */
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
     /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {

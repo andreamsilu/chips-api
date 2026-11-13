@@ -59,7 +59,7 @@ Run migrations on a disposable MySQL 8 database first, then backup and deploy ad
 
 ## Critical invariants
 
-All user input is validated and resource ownership is checked in scoped repositories and policies. Only trusted operators grant vendor/rider/admin roles. Vendor registration is pending until approval. A user may hold multiple roles and memberships. No request can set a role, approval state, computed price, commission, payment status or owner ID through mass assignment.
+All user input is validated and resource ownership is checked in scoped repositories and policies. Only trusted operators approve vendors and grant administrator access. Approved vendors may create dedicated rider accounts belonging to their own business, with the rider role fixed by the server; they cannot grant additional roles or claim another business's riders. Vendor registration is pending until approval. A user may hold multiple roles and memberships. No request can set a role, approval state, computed price, commission, payment status or owner ID through mass assignment.
 
 The backend specification in this request permits **cash pickup**. Such orders are explicitly unpaid until an authorized vendor records collection; delivery always requires verified mobile money before preparation. This differs from the adjacent Flutter app's current all-orders-prepaid rule. Mobile-money checkout reserves stock and snapshots a pending order; only an authenticated provider callback can confirm payment and release it for preparation. The pending record is a payment reservation, not an accepted kitchen order. The API exposes payment and order statuses separately. Checkout locks stock/cart/coupon rows and binds an idempotency key to an exact request digest. Retries return the original result; a changed body with the same key conflicts.
 
@@ -108,3 +108,7 @@ The migration adds nullable product image paths, rider availability (true preser
 Only delivery_base_fee, delivery_per_km, support_email, support_phone and support_hours can be changed through settings. Versions reject stale writes; secret/provider settings remain environment-managed. Delivery pricing changes apply only to future quotes/orders. Stock updates require expected_stock and compare under the product row lock before saving.
 
 Product images are stored privately with generated names and served through controlled image routes. Verification documents are private, downloadable only by authorized administrators or members of the owning vendor. SVG/HTML/executable uploads are rejected. Verification reviews and exports are audited; uploaded bytes, passwords and provider secrets are never recorded in audit metadata.
+
+## Optional customer accounts
+
+Guest checkout reuses the checkout, payment and order services through narrowly scoped capability middleware. Internal anonymous ownership records have no login credentials or roles. Guest sessions scope carts/addresses, while separate per-order tokens scope order read/tracking/cancel/refund operations. Contacts are immutable order snapshots and are never used to claim registered users. The detailed ERD, additive migration sequence, token lifecycle and deployment constraints are documented in operations.md.

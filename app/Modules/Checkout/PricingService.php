@@ -38,10 +38,11 @@ final class PricingService
         if ($data['fulfilment'] === 'delivery') {
             $address = Address::where('user_id', $user->id)->findOrFail($data['address_id']);
             Domain::require($preparedRoute !== null, 'Request a fresh delivery quote.');
-            $delivery = $this->delivery->quote($location, $address, $preparedRoute);
+            $delivery = $this->delivery->quote($location, $address, $preparedRoute) + ['fee_beneficiary' => 'vendor'];
             $fee = $delivery['fee'];
             $snapshot = $address->only(['label', 'details', 'latitude', 'longitude', 'formatted_address', 'google_place_id', 'landmark', 'delivery_instructions']) + ['delivery' => $delivery];
         }
+        $snapshot['customer'] = $user->is_guest ? ['name' => $data['customer_name'] ?? null, 'email' => $data['customer_email'] ?? null, 'phone' => $data['phone']] : ['name' => $user->name, 'email' => $user->email, 'phone' => $user->phone];
         $discount = 0;
         $coupon = null;
         if (! empty($data['coupon'])) {

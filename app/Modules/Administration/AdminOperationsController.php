@@ -106,7 +106,7 @@ final class AdminOperationsController extends Controller
 
     public function riders(Request $request): JsonResponse
     {
-        return response()->json(AdminQuery::page($request, $this->ridersQuery(), ['riders.id', 'vehicle', fn (Builder $q, string $term) => $q->orWhereHas('user', fn (Builder $user) => $user->where('name', 'like', $term)->orWhere('email', 'like', $term))], ['status' => AdminQuery::enum(['pending', 'approved', 'rejected', 'suspended']), 'available' => AdminQuery::boolean()], ['created_at' => 'riders.created_at', 'id' => 'riders.id', 'vehicle' => 'riders.vehicle', 'status' => 'riders.status']));
+        return response()->json(AdminQuery::page($request, $this->ridersQuery(), ['riders.id', 'vehicle', fn (Builder $q, string $term) => $q->orWhereHas('user', fn (Builder $user) => $user->where('name', 'like', $term)->orWhere('email', 'like', $term))], ['vendor_id' => AdminQuery::identifier(), 'status' => AdminQuery::enum(['pending', 'approved', 'rejected', 'suspended']), 'available' => AdminQuery::boolean()], ['created_at' => 'riders.created_at', 'id' => 'riders.id', 'vehicle' => 'riders.vehicle', 'status' => 'riders.status']));
     }
 
     public function rider(Rider $rider): JsonResponse
@@ -116,9 +116,13 @@ final class AdminOperationsController extends Controller
 
     public function updateRider(Request $request, Rider $rider): JsonResponse
     {
-        $data = AdminQuery::body($request, ['status' => ['sometimes', Rule::in(['pending', 'approved', 'rejected', 'suspended'])], 'available' => ['sometimes', 'boolean'], 'vehicle' => ['sometimes', 'required', 'string', 'max:100']]);
+        $data = AdminQuery::body($request, ['vendor_id' => ['sometimes', 'nullable', 'ulid', 'exists:vendors,id'], 'status' => ['sometimes', Rule::in(['pending', 'approved', 'rejected', 'suspended'])], 'available' => ['sometimes', 'boolean'], 'vehicle' => ['sometimes', 'required', 'string', 'max:100']]);
         DB::transaction(function () use ($rider, $data, $request): void {
             $target = Rider::whereKey($rider->id)->lockForUpdate()->firstOrFail();
+            if (array_key_exists('vendor_id', $data) && $target->vendor_id !== $data['vendor_id']) {
+                Domain::require(! $target->deliveries()->whereIn('status', ['assigned', 'picked_up'])->whereHas('order', fn ($q) => $q->whereNotIn('status', ['cancelled', 'rejected', 'delivered']))->exists(), 'Finish or reassign active deliveries before changing rider ownership.');
+                $target->forceFill(['last_latitude' => null, 'last_longitude' => null, 'location_updated_at' => null, 'location_accuracy_meters' => null]);
+            }
             $target->forceFill($data)->save();
             Domain::audit($request->user(), 'rider.updated', $target, $data);
         }, 3);

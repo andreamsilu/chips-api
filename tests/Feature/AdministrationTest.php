@@ -230,7 +230,7 @@ class AdministrationTest extends TestCase
         $actor = $this->signIn();
         config(['marketplace.payouts_enabled' => false]);
 
-        $this->getJson('/api/v1/admin/finance/summary?vendor_id='.$order->vendor_id)->assertOk()->assertJsonPath('data.gross_collections', 12000)->assertJsonPath('data.net_commission', 1000)->assertJsonPath('data.platform_revenue', 3000);
+        $this->getJson('/api/v1/admin/finance/summary?vendor_id='.$order->vendor_id)->assertOk()->assertJsonPath('data.gross_collections', 12000)->assertJsonPath('data.net_commission', 1000)->assertJsonPath('data.platform_revenue', 1000);
         $refund = app(RefundService::class)->request($order, $actor, 'Completed return');
         app(RefundService::class)->approve($refund, $actor, null);
         app(RefundService::class)->approve($refund->fresh(), $actor, 'verified-receipt-12345');

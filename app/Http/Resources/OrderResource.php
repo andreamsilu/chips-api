@@ -21,6 +21,7 @@ class OrderResource extends JsonResource
             'is_customer_order' => $request->user()?->id === $this->user_id,
             'commission' => $this->when($request->routeIs('api.v1.vendor.*'), $this->commission),
             'vendor_name' => $this->whenLoaded('vendor', fn () => $this->vendor->name),
+            'customer_phone' => data_get($this->address_snapshot, 'customer.phone'),
             'vendor_id' => $this->vendor_id,
             'vendor_location_id' => $this->vendor_location_id,
             'fulfilment' => $this->fulfilment,

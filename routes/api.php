@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\ActiveAccount;
+use App\Http\Middleware\GuestOrderAccess;
+use App\Http\Middleware\GuestSessionAccess;
 use App\Modules\Administration\AdminAccess;
 use App\Modules\Administration\AdminAccountsController;
 use App\Modules\Administration\AdminCatalogController;
@@ -12,9 +14,11 @@ use App\Modules\Administration\AdminReportsController;
 use App\Modules\Administration\AdminSettingsController;
 use App\Modules\Catalog\CatalogController;
 use App\Modules\Checkout\CheckoutController;
+use App\Modules\Checkout\GuestCheckoutController;
 use App\Modules\Customers\AddressController;
 use App\Modules\Delivery\DeliveryController;
 use App\Modules\Delivery\LocationController;
+use App\Modules\Delivery\VendorDeliveryController;
 use App\Modules\Engagement\ReviewController;
 use App\Modules\Engagement\SupportController;
 use App\Modules\Identity\AuthController;
@@ -37,7 +41,25 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::get('categories', [CatalogController::class, 'categories'])->name('categories.index');
         Route::get('locations/{location}/products', [CatalogController::class, 'products'])->name('products.index');
         Route::get('vendors/{vendor}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+        Route::post('guest/sessions', [GuestCheckoutController::class, 'start'])->middleware('throttle:guest-start')->name('guest.sessions.store');
+        Route::prefix('guest')->name('guest.')->middleware(GuestSessionAccess::class)->group(function (): void {
+            Route::get('cart', [CheckoutController::class, 'cart'])->name('cart.show');
+            Route::put('cart/items', [CheckoutController::class, 'item'])->name('cart.items');
+            Route::post('cart/quote', [GuestCheckoutController::class, 'quote'])->middleware('throttle:checkout')->name('cart.quote');
+            Route::post('checkout', [GuestCheckoutController::class, 'store'])->middleware('throttle:checkout')->name('checkout');
+            Route::apiResource('addresses', AddressController::class)->except('show');
+            Route::post('location/autocomplete', [LocationController::class, 'autocomplete'])->middleware('throttle:maps')->name('location.autocomplete');
+            Route::post('location/place', [LocationController::class, 'place'])->middleware('throttle:maps')->name('location.place');
+            Route::post('location/geocode', [LocationController::class, 'geocode'])->middleware('throttle:maps')->name('location.geocode');
+        });
+        Route::prefix('guest/orders/{order}')->name('guest.orders.')->middleware(GuestOrderAccess::class)->group(function (): void {
+            Route::get('', [OrderController::class, 'show'])->name('show');
+            Route::get('tracking', [LocationController::class, 'tracking'])->middleware('throttle:maps')->name('tracking');
+            Route::post('cancel', [OrderController::class, 'cancel'])->name('cancel');
+            Route::post('refund', [OrderController::class, 'refund'])->name('refund');
+        });
         Route::middleware(['auth:sanctum', ActiveAccount::class])->group(function (): void {
+            Route::post('cart/guest-merge', [GuestCheckoutController::class, 'mergeCart'])->name('cart.guest-merge');
             Route::get('auth/me', [AuthController::class, 'me'])->name('auth.me');
             Route::patch('auth/me', [AuthController::class, 'update'])->name('auth.update');
             Route::post('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
@@ -69,6 +91,12 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::put('vendor/locations/{location}/products/{product}', [CatalogController::class, 'save'])->name('products.update');
             Route::get('vendor/businesses/{vendor}/coupons', [CouponController::class, 'index'])->name('coupons.index');
             Route::post('vendor/businesses/{vendor}/coupons', [CouponController::class, 'store'])->name('coupons.store');
+            Route::get('vendor/businesses/{vendor}/riders', [VendorDeliveryController::class, 'riders'])->name('vendor.riders.index');
+            Route::post('vendor/businesses/{vendor}/riders', [VendorDeliveryController::class, 'storeRider'])->middleware('throttle:checkout')->name('vendor.riders.store');
+            Route::patch('vendor/businesses/{vendor}/riders/{rider}', [VendorDeliveryController::class, 'updateRider'])->name('vendor.riders.update');
+            Route::get('vendor/businesses/{vendor}/deliveries', [VendorDeliveryController::class, 'deliveries'])->name('vendor.deliveries.index');
+            Route::post('vendor/businesses/{vendor}/deliveries/{delivery}/assignment', [VendorDeliveryController::class, 'assign'])->name('vendor.deliveries.assign');
+            Route::patch('vendor/businesses/{vendor}/deliveries/{delivery}', [VendorDeliveryController::class, 'update'])->name('vendor.deliveries.update');
             Route::get('rider/deliveries', [DeliveryController::class, 'index'])->name('deliveries.index');
             Route::patch('rider/deliveries/{delivery}', [DeliveryController::class, 'update'])->name('deliveries.update');
             Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

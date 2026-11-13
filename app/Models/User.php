@@ -41,12 +41,12 @@ class User extends Authenticatable
 
     public function hasRole(string $role): bool
     {
-        return $this->suspended_at === null && $this->roles()->where('name', $role)->exists();
+        return ! $this->is_guest && $this->suspended_at === null && $this->roles()->where('name', $role)->exists();
     }
 
     public function manages(string $vendorId): bool
     {
-        return $this->suspended_at === null && DB::table('vendor_members')->where('vendor_id', $vendorId)->where('user_id', $this->id)->exists();
+        return ! $this->is_guest && $this->suspended_at === null && DB::table('vendor_members')->where('vendor_id', $vendorId)->where('user_id', $this->id)->exists();
     }
 
     /**
@@ -57,6 +57,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'is_guest' => 'boolean',
             'email_verified_at' => 'datetime',
             'suspended_at' => 'datetime',
             'password' => 'hashed',

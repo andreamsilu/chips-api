@@ -13,9 +13,10 @@ final class LedgerService
             return;
         }
         $net = $order->subtotal - $order->discount;
+        $vendorDelivery = data_get($order->address_snapshot, 'delivery.fee_beneficiary') === 'vendor' ? $order->delivery_fee : 0;
         $accounts = $order->payment_method === 'cash'
             ? ['vendor_payable' => -$order->commission, 'platform_commission' => $order->commission]
-            : ['provider_clearing' => -$order->total, 'vendor_payable' => $net - $order->commission, 'platform_commission' => $order->commission, 'delivery_revenue' => $order->delivery_fee];
+            : ['provider_clearing' => -$order->total, 'vendor_payable' => $net - $order->commission + $vendorDelivery, 'platform_commission' => $order->commission, 'delivery_revenue' => $order->delivery_fee - $vendorDelivery];
         foreach ($accounts as $account => $amount) {
             LedgerEntry::record(['order_id' => $order->id, 'vendor_id' => $order->vendor_id, 'account' => $account, 'kind' => 'capture', 'amount' => $amount, 'currency' => 'TZS']);
         }

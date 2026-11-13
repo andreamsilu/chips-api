@@ -20,7 +20,7 @@ final class AdminAccountsController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = User::with('roles')->withCount('orders');
+        $query = User::where('is_guest', false)->with('roles')->withCount('orders');
         if ($request->routeIs('api.v1.admin.customers.*')) {
             $query->whereHas('roles', fn (Builder $roles) => $roles->where('name', 'customer'));
         }
@@ -78,6 +78,7 @@ final class AdminAccountsController extends Controller
 
     public function roles(Request $request, User $user): JsonResponse
     {
+        abort_if($user->is_guest, 404);
         $data = AdminQuery::body($request, ['roles' => ['required', 'array', 'min:1', 'max:5'], 'roles.*' => ['required', 'distinct', Rule::in(self::ROLES)]]);
         DB::transaction(function () use ($data, $request, $user): void {
             Role::where('name', 'admin')->lockForUpdate()->firstOrFail();
@@ -117,6 +118,7 @@ final class AdminAccountsController extends Controller
 
     public function password(Request $request, User $user): JsonResponse
     {
+        abort_if($user->is_guest, 404);
         $data = AdminQuery::body($request, ['password' => ['required', 'string', 'max:1024', 'confirmed', Password::min(12)->mixedCase()->numbers()], 'password_confirmation' => ['required', 'string']]);
         DB::transaction(function () use ($request, $user, $data): void {
             $target = User::whereKey($user->id)->lockForUpdate()->firstOrFail();
@@ -136,6 +138,7 @@ final class AdminAccountsController extends Controller
 
     private function customerScope(Request $request, User $user): void
     {
+        abort_if($user->is_guest, 404);
         if ($request->routeIs('api.v1.admin.customers.*')) {
             abort_unless($user->roles()->where('name', 'customer')->exists(), 404);
             if (! $request->isMethod('GET')) {

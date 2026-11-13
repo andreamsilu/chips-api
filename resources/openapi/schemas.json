@@ -3215,7 +3215,10 @@
             "maxLength": 160
           },
           "email": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "email"
           },
           "phone": {
@@ -3582,6 +3585,17 @@
       },
       "completed_deliveries_count": {
         "type": "integer"
+      },
+      "vendor_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
       }
     },
     "required": [
@@ -5061,6 +5075,17 @@
       "vehicle": {
         "type": "string",
         "maxLength": 100
+      },
+      "vendor_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
       }
     },
     "required": [],
@@ -6056,6 +6081,11 @@
       },
       "destination": {
         "$ref": "#/components/schemas/LocationPoint"
+      },
+      "fee_beneficiary": {
+        "enum": [
+          "vendor"
+        ]
       }
     },
     "required": [
@@ -6780,5 +6810,450 @@
       "longitude"
     ],
     "additionalProperties": false
+  },
+  "VendorRider": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "vendor_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "phone": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 20
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "vehicle": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "status": {
+        "enum": [
+          "approved",
+          "suspended",
+          "pending",
+          "rejected"
+        ]
+      },
+      "available": {
+        "type": "boolean"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "vendor_id",
+      "name",
+      "email",
+      "phone",
+      "vehicle",
+      "status",
+      "available",
+      "created_at"
+    ],
+    "additionalProperties": false
+  },
+  "VendorRiderCreate": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "maxLength": 160,
+        "minLength": 1
+      },
+      "email": {
+        "type": "string",
+        "format": "email",
+        "maxLength": 255
+      },
+      "phone": {
+        "type": "string",
+        "pattern": "^\\+255[67][0-9]{8}$"
+      },
+      "vehicle": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1
+      },
+      "password": {
+        "type": "string",
+        "minLength": 12,
+        "maxLength": 1024
+      },
+      "password_confirmation": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "name",
+      "email",
+      "phone",
+      "vehicle",
+      "password",
+      "password_confirmation"
+    ],
+    "additionalProperties": false,
+    "description": "Creates a dedicated rider login belonging to this approved business. Role is fixed to rider. Password requires mixed case and numbers. No credential is returned."
+  },
+  "VendorRiderUpdate": {
+    "type": "object",
+    "properties": {
+      "vehicle": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "available": {
+        "type": "boolean"
+      },
+      "status": {
+        "enum": [
+          "approved",
+          "suspended"
+        ]
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "VendorRiderResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/VendorRider"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": false
+  },
+  "VendorRiderPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/VendorRider"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "VendorDelivery": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "rider_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "status": {
+        "enum": [
+          "unassigned",
+          "assigned",
+          "picked_up",
+          "delivered"
+        ]
+      },
+      "order_status": {
+        "type": "string",
+        "maxLength": 40
+      },
+      "payment_status": {
+        "type": "string",
+        "maxLength": 40
+      },
+      "destination": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "rider": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/VendorRider"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "picked_up_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "delivered_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "order_id",
+      "rider_id",
+      "status",
+      "order_status",
+      "payment_status",
+      "destination",
+      "rider",
+      "picked_up_at",
+      "delivered_at",
+      "created_at"
+    ],
+    "additionalProperties": false
+  },
+  "VendorDeliveryResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "$ref": "#/components/schemas/VendorDelivery"
+      }
+    },
+    "required": [
+      "data"
+    ],
+    "additionalProperties": false
+  },
+  "VendorDeliveryPage": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/VendorDelivery"
+        }
+      },
+      "current_page": {
+        "type": "integer"
+      },
+      "last_page": {
+        "type": "integer"
+      },
+      "per_page": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "current_page",
+      "last_page",
+      "per_page",
+      "total"
+    ],
+    "additionalProperties": true
+  },
+  "VendorDeliveryAssign": {
+    "type": "object",
+    "properties": {
+      "rider_id": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      }
+    },
+    "required": [
+      "rider_id"
+    ],
+    "additionalProperties": false
+  },
+  "GuestCheckout": {
+    "allOf": [
+      {
+        "$ref": "#/components/schemas/Checkout"
+      },
+      {
+        "type": "object",
+        "required": [
+          "phone",
+          "customer_name"
+        ],
+        "properties": {
+          "customer_name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "customer_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "email",
+            "description": "Required for mobile money by Snippe; not an account login."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Tanzania contact/mobile-money number required for every guest order."
+          }
+        }
+      }
+    ]
+  },
+  "GuestSessionResponse": {
+    "type": "object",
+    "required": [
+      "data"
+    ],
+    "properties": {
+      "data": {
+        "type": "object",
+        "required": [
+          "token",
+          "expires_at"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "GuestOrderResponse": {
+    "allOf": [
+      {
+        "$ref": "#/components/schemas/OrderResponse"
+      },
+      {
+        "type": "object",
+        "required": [
+          "guest_order_token",
+          "guest_order_expires_at"
+        ],
+        "properties": {
+          "guest_order_token": {
+            "type": "string",
+            "description": "Private capability for this order only. Store securely; never put in a URL.",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "guest_order_expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    ]
+  },
+  "GuestMergeResponse": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "object",
+        "properties": {
+          "merged": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "GuestQuote": {
+    "allOf": [
+      {
+        "$ref": "#/components/schemas/Checkout"
+      },
+      {
+        "type": "object",
+        "required": [
+          "phone"
+        ],
+        "properties": {
+          "customer_name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "customer_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "email",
+            "description": "Required for mobile money by Snippe; not an account login."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Tanzania contact/mobile-money number required for every guest order."
+          }
+        }
+      }
+    ]
   }
 }

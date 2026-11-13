@@ -31,11 +31,11 @@ final class OpenApiDocument
             foreach ($metadata['query'] ?? [] as $parameter) {
                 $parameters[] = $parameter;
             }
-            $operation = ['summary' => $metadata['summary'], 'tags' => [$metadata['tag']], 'parameters' => $parameters, 'security' => in_array('auth:sanctum', $route->gatherMiddleware(), true) ? [['bearerAuth' => []]] : [], 'responses' => []];
+            $operation = ['summary' => $metadata['summary'], 'tags' => [$metadata['tag']], 'parameters' => $parameters, 'security' => ($metadata['security'] ?? (in_array('auth:sanctum', $route->gatherMiddleware(), true) ? [['bearerAuth' => []]] : [])), 'responses' => []];
             if (isset($metadata['body'])) {
                 $operation['requestBody'] = ['required' => ! ($metadata['optional_body'] ?? false), 'content' => [($metadata['request_media'] ?? 'application/json') => ['schema' => ['$ref' => '#/components/schemas/'.$metadata['body']]]]];
             }
-            if ($name === 'checkout') {
+            if (in_array($name, ['checkout', 'guest.checkout'], true)) {
                 $operation['parameters'][] = ['name' => 'Idempotency-Key', 'in' => 'header', 'required' => true, 'schema' => ['type' => 'string', 'minLength' => 8, 'maxLength' => 100, 'pattern' => '^[A-Za-z0-9_-]+$']];
             }
             if ($name === 'payments.webhook') {
@@ -57,6 +57,6 @@ final class OpenApiDocument
         }
         ksort($paths);
 
-        return ['openapi' => '3.1.0', 'info' => ['title' => 'MloExpress API', 'version' => '1.0.0', 'description' => 'Integer TZS. ULID public identifiers. Sanctum bearer tokens. Pending mobile-money checkout is a stock reservation; only verified payment confirms it. Cash is restricted to pickup, with explicit vendor receipt confirmation.'], 'servers' => [['url' => '/']], 'paths' => $paths, 'components' => ['securitySchemes' => ['bearerAuth' => ['type' => 'http', 'scheme' => 'bearer', 'description' => 'Expiring Laravel Sanctum personal access token. Store securely.']], 'schemas' => $schemas]];
+        return ['openapi' => '3.1.0', 'info' => ['title' => 'MloExpress API', 'version' => '1.0.0', 'description' => 'Integer TZS. ULID public identifiers. Sanctum bearer tokens. Pending mobile-money checkout is a stock reservation; only verified payment confirms it. Cash is restricted to pickup, with explicit vendor receipt confirmation.'], 'servers' => [['url' => '/']], 'paths' => $paths, 'components' => ['securitySchemes' => ['guestSessionAuth' => ['type' => 'apiKey', 'in' => 'header', 'name' => 'X-Guest-Token', 'description' => 'Private guest cart token; cannot access registered account routes.'], 'guestOrderAuth' => ['type' => 'apiKey', 'in' => 'header', 'name' => 'X-Order-Token', 'description' => 'Private expiring capability scoped to one order.'], 'bearerAuth' => ['type' => 'http', 'scheme' => 'bearer', 'description' => 'Expiring Laravel Sanctum personal access token. Store securely.']], 'schemas' => $schemas]];
     }
 }

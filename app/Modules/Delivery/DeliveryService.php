@@ -18,6 +18,9 @@ final class DeliveryService
             $order = Order::whereKey($input->order_id)->lockForUpdate()->firstOrFail();
             $delivery = Delivery::whereKey($input->id)->lockForUpdate()->firstOrFail();
             $rider = Rider::whereKey($rider->id)->lockForUpdate()->firstOrFail();
+            abort_unless($actor->hasRole('admin') || ($actor->hasRole('vendor') && $actor->manages($order->vendor_id) && $rider->vendor_id === $order->vendor_id && $order->vendor()->where('status', 'approved')->exists()), 403);
+            Domain::require($rider->vendor_id === null || $rider->vendor_id === $order->vendor_id, 'Rider belongs to another vendor.');
+            Domain::require(! Delivery::where('rider_id', $rider->id)->where('id', '!=', $delivery->id)->whereIn('status', ['assigned', 'picked_up'])->whereHas('order', fn ($q) => $q->whereNotIn('status', ['cancelled', 'rejected', 'delivered']))->exists(), 'Rider already has an active delivery.');
             Domain::require($order->status === 'ready' && $order->payment_status === 'verified', 'Only paid, ready orders may be assigned.');
             Domain::require($rider->status === 'approved' && $rider->available && $rider->user()->whereNull('suspended_at')->exists(), 'Rider is unavailable.');
             Domain::require(in_array($delivery->status, ['unassigned', 'assigned'], true), 'Delivery has already started.');

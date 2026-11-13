@@ -36,6 +36,9 @@ final class AdminData
             $data = $model->only(['id', 'vendor_id', 'vendor_location_id', 'fulfilment', 'status', 'payment_method', 'payment_status', 'currency', 'subtotal', 'discount', 'delivery_fee', 'commission_bps', 'commission', 'total', 'created_at']);
             $data['address'] = $model->address_snapshot;
             $data['customer'] = self::person($model->customer);
+            if ($model->customer?->is_guest && is_array(data_get($model->address_snapshot, 'customer'))) {
+                $data['customer'] = array_replace($data['customer'], data_get($model->address_snapshot, 'customer'));
+            }
             $data['vendor_name'] = $model->vendor?->name;
             $data['payment'] = $model->payment?->only(['id', 'merchant_reference', 'provider_reference', 'status', 'verified_at']);
             $data['refund'] = $model->refund?->only(['id', 'amount', 'status', 'reason', 'external_receipt', 'provider_reference']);
@@ -51,7 +54,7 @@ final class AdminData
             return $data;
         }
         if ($model instanceof Rider) {
-            return $model->only(['id', 'status', 'vehicle', 'available', 'created_at', 'deliveries_count', 'active_deliveries_count', 'completed_deliveries_count']) + ['user' => self::person($model->user)];
+            return $model->only(['id', 'vendor_id', 'status', 'vehicle', 'available', 'created_at', 'deliveries_count', 'active_deliveries_count', 'completed_deliveries_count']) + ['user' => self::person($model->user)];
         }
         if ($model instanceof Delivery) {
             return $model->only(['id', 'order_id', 'rider_id', 'status', 'picked_up_at', 'delivered_at', 'created_at']) + ['rider' => $model->rider === null ? null : self::row($model->rider), 'order_status' => $model->order?->status, 'payment_status' => $model->order?->payment_status];

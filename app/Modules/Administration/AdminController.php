@@ -44,6 +44,7 @@ final class AdminController extends Controller
 
     public function role(Request $request, User $user): JsonResponse
     {
+        abort_if($user->is_guest, 404);
         Gate::authorize('administer');
         $data = $request->validate(['role' => ['required', 'in:customer,vendor,rider,support,admin']]);
         DB::transaction(function () use ($request, $user, $data): void {
@@ -56,6 +57,7 @@ final class AdminController extends Controller
 
     public function rider(Request $request, User $user): JsonResponse
     {
+        abort_if($user->is_guest, 404);
         Gate::authorize('administer');
         $data = $request->validate(['vehicle' => ['required', 'string', 'max:100']]);
         $rider = DB::transaction(function () use ($user, $data, $request): Rider {

@@ -15,7 +15,10 @@ final class OrderSms
         if (! config('services.nextsms.enabled') || $message->payload['status'] !== $order->status || $message->payload['payment_status'] !== $order->payment_status) {
             return;
         }
-        $recipient = ltrim((string) $order->customer->phone, '+');
+        if ($order->customer->is_guest && ! in_array($order->payment_status, ['verified', 'refunded', 'refund_pending'], true)) {
+            return;
+        }
+        $recipient = ltrim((string) (data_get($order->address_snapshot, 'customer.phone') ?? $order->customer->phone), '+');
         if (! preg_match('/^255[67]\d{8}$/', $recipient)) {
             return;
         }

@@ -5,7 +5,9 @@ return [
     'nextsms' => [
         'enabled' => (bool) env('NEXTSMS_ENABLED', false),
         'token' => env('NEXTSMS_API_TOKEN'),
-        'sender' => env('NEXTSMS_SENDER_ID'),
+        'sender' => env('NEXT_SMS_SENDER_ID') ?: env('NEXTSMS_SENDER_ID'),
+        'authorization' => env('NEXT_SMS_AUTHORIZATION'),
+        'api_url' => env('NEXT_SMS_API_URL') ?: 'https://messaging-service.co.tz/api/sms/v2/text/single',
     ],
 
     /*

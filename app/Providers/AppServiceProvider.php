@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
         Gate::define('administer', fn (User $user) => $user->hasRole('admin'));
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($request->user()->id ?? $request->ip()));
+        RateLimiter::for('guest-start', fn (Request $request) => [Limit::perMinute(10)->by('guest-minute:'.$request->ip()), Limit::perDay(300)->by('guest-day:'.$request->ip())]);
         RateLimiter::for('authentication', fn (Request $request) => [Limit::perMinute(5)->by(hash('sha256', strtolower((string) $request->input('email')).'|'.$request->ip())), Limit::perMinute(30)->by($request->ip())]);
         RateLimiter::for('checkout', fn (Request $request) => Limit::perMinute(10)->by($request->user()->id ?? $request->ip()));
         RateLimiter::for('maps', fn (Request $request) => [Limit::perMinute(30)->by('maps-user:'.($request->user()->id ?? $request->ip())), Limit::perMinute(300)->by('maps-provider')]);

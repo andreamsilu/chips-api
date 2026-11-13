@@ -71,9 +71,9 @@ Common response statuses: 401 unauthenticated, 403 insufficient role, 404 inacce
 7. Retry a lost checkout response with the **same key and exact body**. It returns the existing reservation and does not charge or reserve again. A changed request with the same key returns 409. A new key means a new operation; never generate one automatically after an uncertain charge.
 8. Vendors accept, prepare and mark ready through `PATCH /vendor/orders/{id}`. Delivery cannot enter preparation without verified mobile-money payment. Administrators assign paid ready deliveries, and only the assigned rider can record `picked_up` / `delivered`.
 
-`pickup` removes the delivery fee and permits `cash`, `mpesa`, `tigo_pesa` (Snippe detects Mixx by Yas from the phone), or `airtel_money`. Cash pickup starts `confirmed` with payment `pending`. An authorized vendor must explicitly post `{"cash_received":true}` to `/vendor/orders/{id}/cash` before marking collection `completed`. The ledger records vendor cash commission as debt rather than a fictitious payable. The live Flutter client supports this cash-pickup workflow; its explicit demo mode retains prepaid-only behavior.
+`pickup` removes the delivery fee and permits `cash`, `mpesa`, `tigo_pesa` (Snippe detects Mixx by Yas from the phone), or `airtel_money`. Cash pickup starts `confirmed` with payment `pending`. An authorized vendor must explicitly post `{"cash_received":true}` to `/vendor/orders/{id}/cash` before marking collection `completed`. The ledger records vendor cash commission as debt rather than a fictitious payable. The live Flutter client supports this cash-pickup workflow.
 
-Delivery fees are configured as a base plus each rounded-up kilometre within the location's service radius. Commissions use the approved vendor's rate in basis points, after a vendor-funded discount; delivery revenue is separate. Client totals never determine charges. The optional expected_total is a price-change guard: a mismatch returns 422 before reservation or payment; review a fresh quote. Payment status and commission remain server-controlled.
+Delivery fees use verified Google road distance and database pricing rules (fixed, base plus per-kilometre charge, or zones), with minimum fees and maximum road distance. Commissions use the approved vendor's rate in basis points, after a vendor-funded discount, and exclude delivery fees. New orders credit the delivery fee to the vendor settlement balance; historical orders retain their immutable allocation. Vendors manage their own riders and delivery assignments; platform administrators retain audited oversight. Client totals never determine charges. The optional expected_total is a price-change guard: a mismatch returns 422 before reservation or payment; review a fresh quote. Payment status and commission remain server-controlled.
 
 ### Real-time and pagination
 
@@ -114,3 +114,7 @@ To verify a deployment, compare the successful pipeline commit with `/var/www/ch
 Deployment SSH variables must use GitLab File type, include the `production` environment, and be available to protected `main` pipelines. After rotating either SSH variable, run a fresh pipeline to verify deployment access. Confirm that `deploy_production` succeeds before considering the release deployed.
 
 The deployment job verifies the packaged release checksum before connecting to the production server.
+
+## Guest checkout
+
+Customer registration is optional for browsing, carts, quotes and checkout. The guest API uses private session and per-order capabilities; Snippe still requires a real payment email for mobile-money collections. See [guest checkout architecture and migration](docs/operations.md#guest-checkout-architecture-and-migration-plan) before deploying the updated clients. Guest order access is device-held and expires; matching phone/email never grants account or order access.

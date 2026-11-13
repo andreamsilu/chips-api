@@ -70,8 +70,9 @@ final class CheckoutService
             }
             if (! $cash) {
                 Domain::require($order->total >= 500, 'Snippe requires a payment of at least TZS 500.');
-                $names = explode(' ', trim($user->name), 2);
-                $payload = ['payment_type' => 'mobile', 'details' => ['amount' => $order->total, 'currency' => 'TZS'], 'phone_number' => ltrim($data['phone'], '+'), 'customer' => ['firstname' => $names[0], 'lastname' => $names[1] ?? $names[0], 'email' => $user->email], 'webhook_url' => config('marketplace.webhook_url'), 'metadata' => ['order_id' => $order->id]];
+                $contact = $snapshot['customer'];
+                $names = explode(' ', trim($contact['name']), 2);
+                $payload = ['payment_type' => 'mobile', 'details' => ['amount' => $order->total, 'currency' => 'TZS'], 'phone_number' => ltrim($data['phone'], '+'), 'customer' => ['firstname' => $names[0], 'lastname' => $names[1] ?? $names[0], 'email' => $contact['email']], 'webhook_url' => config('marketplace.webhook_url'), 'metadata' => ['order_id' => $order->id]];
                 $payment = Payment::record(['order_id' => $order->id, 'merchant_reference' => $order->id, 'status' => 'pending', 'amount' => $order->total, 'currency' => 'TZS', 'phone' => $data['phone'], 'request_payload' => $payload]);
                 DB::afterCommit(function () use ($payment): void {
                     try {

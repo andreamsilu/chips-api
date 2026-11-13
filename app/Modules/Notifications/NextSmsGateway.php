@@ -11,7 +11,23 @@ final class NextSmsGateway
 {
     public function requireConfiguration(): void
     {
-        if (! config('services.nextsms.token') || ! config('services.nextsms.sender')) {
+        $url = config('services.nextsms.api_url');
+        $authorization = config('services.nextsms.authorization');
+        if (! config('services.nextsms.sender')) {
+            throw new RuntimeException('An approved NextSMS sender ID is required.');
+        }
+        if ($url === 'https://messaging-service.co.tz/api/sms/v1/text/single') {
+            if (! is_string($authorization) || ! preg_match('/^Basic ([A-Za-z0-9+\/]+=*)$/D', $authorization, $matches)) {
+                throw new RuntimeException('NextSMS v1 requires valid Basic authorization.');
+            }
+            $credentials = base64_decode($matches[1], true);
+            $separator = is_string($credentials) ? strpos($credentials, ':') : false;
+            if ($separator === false || $separator === 0 || $separator === strlen($credentials) - 1) {
+                throw new RuntimeException('NextSMS v1 requires valid Basic authorization.');
+            }
+        } elseif ($url !== 'https://messaging-service.co.tz/api/sms/v2/text/single' || $authorization) {
+            throw new RuntimeException('NextSMS endpoint and authentication configuration do not match.');
+        } elseif (! config('services.nextsms.token')) {
             throw new RuntimeException('NextSMS token and approved sender ID are required.');
         }
     }
@@ -21,13 +37,18 @@ final class NextSmsGateway
     {
         $this->requireConfiguration();
         try {
-            $response = Http::withToken(config('services.nextsms.token'))
+            $authorization = config('services.nextsms.authorization');
+            $client = $authorization
+                ? Http::withHeaders(['Authorization' => $authorization])
+                : Http::withToken(config('services.nextsms.token'));
+            $payload = ['from' => config('services.nextsms.sender'), 'to' => $recipient, 'text' => $text];
+            if (! $authorization) {
+                $payload['reference'] = $reference;
+            }
+            $response = $client
                 ->acceptJson()->asJson()->withoutRedirecting()
                 ->connectTimeout(5)->timeout(15)
-                ->post('https://messaging-service.co.tz/api/sms/v2/text/single', [
-                    'from' => config('services.nextsms.sender'),
-                    'to' => $recipient, 'text' => $text, 'reference' => $reference,
-                ]);
+                ->post(config('services.nextsms.api_url'), $payload);
         } catch (ConnectionException) {
             return $this->result('unknown', error: 'connection_uncertain');
         }
